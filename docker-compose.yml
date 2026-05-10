@@ -2,12 +2,11 @@ services:
   tournament:
     build: .
     container_name: unmatched-tournament
-    env_file:
-      - .env
     ports:
       - "8742:8742"
     environment:
       PORT: "8742"
       HTML_FILE: "tournament_b2.html"
+      PASSWORD_HASH: "8b23fadf05a3846fb8d537ba97975e884634fc146ef709f54caa73a409e86420"
       SECRET_KEY: "12c641fcdc309a715075fffee3e9b819040cf4a9f74d3f4911bd290d74df265f"
     restart: unless-stopped
