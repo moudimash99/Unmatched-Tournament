@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
 
 PW_HASH  = os.environ["PASSWORD_HASH"]
-HTML_FILE = os.environ.get("HTML_FILE", "tournament_b2.html")
+HTML_FILE = os.environ.get("HTML_FILE", "tournament_a.html")
 
 def check(pw):
     return hashlib.sha256(pw.encode()).hexdigest() == PW_HASH
