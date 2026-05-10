@@ -11,6 +11,6 @@ services:
       SECRET_KEY: "12c641fcdc309a715075fffee3e9b819040cf4a9f74d3f4911bd290d74df265f"
     restart: unless-stopped
 
-  networks:
-    proxy-net:
-      external: true
+networks:
+  proxy-net:
+    external: true
