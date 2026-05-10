@@ -1,0 +1,89 @@
+{
+  "tier_list_metadata": {
+    "version": "2026.05 Competitive Meta",
+    "sources": [
+      "Unmatched Database (UMDB)",
+      "r/Unmatched Meta Report (Feb 2026)",
+      "Tabletop Playbook Analysis (April 2026)"
+    ]
+  },
+  "tiers": {
+    "S": {
+      "rank": "Elite",
+      "fighters": [
+        "ciri",
+        "medusa",
+        "sherlock_holmes",
+        "elektra",
+        "achilles"
+      ]
+    },
+    "A_plus": {
+      "rank": "Power",
+      "fighters": [
+        "ancient_leshen",
+        "sun_wukong",
+        "yennenga",
+        "bigfoot"
+      ]
+    },
+    "A": {
+      "rank": "Strong",
+      "fighters": [
+        "daredevil",
+        "bullseye",
+        "little_red",
+        "sinbad",
+        "geralt",
+        "robin_hood"
+      ]
+    },
+    "B": {
+      "rank": "Solid",
+      "fighters": [
+        "t_rex",
+        "alice",
+        "dracula",
+        "she_hulk",
+        "spider_man",
+        "nikola_tesla",
+        "dr_jill_trent",
+        "annie_christmas",
+        "the_golden_bat",
+        "winter_soldier",
+        "black_widow",
+        "bloody_mary"
+      ]
+    },
+    "C": {
+      "rank": "Niche",
+      "fighters": [
+        "luke_cage",
+        "raptors",
+        "invisible_man",
+        "jekyll_hyde",
+        "moon_knight",
+        "ghost_rider",
+        "houdini",
+        "the_genie",
+        "ms_marvel",
+        "squirrel_girl",
+        "cloak_and_dagger",
+        "black_panther",
+        "doctor_strange",
+        "eredin",
+        "philippa_eilhart",
+        "yennefer_triss",
+        "robert_muldoon"
+      ]
+    },
+    "D": {
+      "rank": "Underpowered",
+      "fighters": [
+        "dr_sattler",
+        "king_arthur",
+        "beowulf"
+      ]
+    }
+  }
+}

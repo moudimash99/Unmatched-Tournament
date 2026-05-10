@@ -1,0 +1,1278 @@
+{
+  "fighters": [
+    {
+      "id": "king_arthur",
+      "name": "King Arthur",
+      "set": [
+        "Battle of Legends Vol. 1"
+      ],
+      "foundational_mechanism": "Excalibur Boost valuation",
+      "range": "Hybrid",
+      "image_url": "/static/pics/king_arthur.webp",
+      "major": [
+        "burst"
+      ],
+      "minor": [
+        "resource_management",
+        "combo",
+        "rushdown"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "alice",
+      "name": "Alice",
+      "set": [
+        "Battle of Legends Vol. 1"
+      ],
+      "foundational_mechanism": "Size alteration buffs",
+      "range": "Melee",
+      "image_url": "/static/pics/alice.webp",
+      "major": [
+        "adaptive"
+      ],
+      "minor": [
+        "stance"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "medusa",
+      "name": "Medusa",
+      "set": [
+        "Battle of Legends Vol. 1"
+      ],
+      "foundational_mechanism": "Passive zone damage",
+      "range": "Ranged Assist",
+      "image_url": "/static/pics/medusa.webp",
+      "major": [
+        "control"
+      ],
+      "minor": [
+        "disruption",
+        "ranged_pressure",
+        "swarm"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "sinbad",
+      "name": "Sinbad",
+      "set": [
+        "Battle of Legends Vol. 1"
+      ],
+      "foundational_mechanism": "Voyage card accumulation",
+      "range": "Melee",
+      "image_url": "/static/pics/sinbad.webp",
+      "major": [
+        "scaling"
+      ],
+      "minor": [
+        "evasion",
+        "adaptive",
+        "burst"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "robin_hood",
+      "name": "Robin Hood",
+      "set": [
+        "Robin Hood vs. Bigfoot"
+      ],
+      "foundational_mechanism": "Post-attack forced movement",
+      "range": "Ranged Assist",
+      "image_url": "/static/pics/robin_hood.webp",
+      "major": [
+        "evasion"
+      ],
+      "minor": [
+        "swarm",
+        "control",
+        "ranged_pressure"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "bigfoot",
+      "name": "Bigfoot",
+      "set": [
+        "Robin Hood vs. Bigfoot"
+      ],
+      "foundational_mechanism": "High mobility aggression",
+      "range": "Melee",
+      "image_url": "/static/pics/bigfoot.webp",
+      "major": [
+        "rushdown"
+      ],
+      "minor": [
+        "burst",
+        "control"
+      ],
+      "themes": [
+        "legend",
+        "monster"
+      ]
+    },
+    {
+      "id": "bruce_lee",
+      "name": "Bruce Lee",
+      "set": [
+        "Bruce Lee",
+        "Muhammad Ali vs. Bruce Lee"
+      ],
+      "foundational_mechanism": "Sequential extra actions",
+      "range": "Melee",
+      "image_url": "/static/pics/bruce_lee.webp",
+      "major": [
+        "combo"
+      ],
+      "minor": [
+        "burst",
+        "evasion",
+        "technical"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "robert_muldoon",
+      "name": "Robert Muldoon",
+      "set": [
+        "InGen vs. Raptors"
+      ],
+      "foundational_mechanism": "Trap placement zoning",
+      "range": "Ranged",
+      "image_url": "/static/pics/robert_muldoon.webp",
+      "major": [
+        "control"
+      ],
+      "minor": [
+        "swarm",
+        "ranged_pressure",
+        "disruption"
+      ],
+      "themes": [
+        "film"
+      ]
+    },
+    {
+      "id": "raptors",
+      "name": "Raptors",
+      "set": [
+        "InGen vs. Raptors"
+      ],
+      "foundational_mechanism": "Adjacency attack buffs",
+      "range": "Melee",
+      "image_url": "/static/pics/raptors.webp",
+      "major": [
+        "swarm"
+      ],
+      "minor": [
+        "rushdown",
+        "burst"
+      ],
+      "themes": [
+        "monster"
+      ]
+    },
+    {
+      "id": "dracula",
+      "name": "Dracula",
+      "set": [
+        "Cobble & Fog"
+      ],
+      "foundational_mechanism": "Beastform timing execution",
+      "range": "Melee",
+      "image_url": "/static/pics/dracula.webp",
+      "major": [
+        "attrition"
+      ],
+      "minor": [
+        "resource_management",
+        "burst",
+        "evasion"
+      ],
+      "themes": [
+        "halloween",
+        "monster"
+      ]
+    },
+    {
+      "id": "invisible_man",
+      "name": "The Invisible Man",
+      "set": [
+        "Cobble & Fog"
+      ],
+      "foundational_mechanism": "Fog token teleportation",
+      "range": "Melee",
+      "image_url": "/static/pics/invisible_man.webp",
+      "major": [
+        "evasion"
+      ],
+      "minor": [
+        "control",
+        "disruption",
+        "resource_management"
+      ],
+      "themes": [
+        "halloween",
+        "monster"
+      ]
+    },
+    {
+      "id": "jekyll_hyde",
+      "name": "Jekyll & Hyde",
+      "set": [
+        "Cobble & Fog"
+      ],
+      "foundational_mechanism": "Drastic mode switching",
+      "range": "Melee",
+      "image_url": "/static/pics/jekyll_hyde.webp",
+      "major": [
+        "stance"
+      ],
+      "minor": [
+        "burst",
+        "adaptive"
+      ],
+      "themes": [
+        "halloween",
+        "monster"
+      ]
+    },
+    {
+      "id": "sherlock_holmes",
+      "name": "Sherlock Holmes",
+      "set": [
+        "Cobble & Fog"
+      ],
+      "foundational_mechanism": "Psychological hand knowledge",
+      "range": "Hybrid",
+      "image_url": "/static/pics/sherlock_holmes.webp",
+      "major": [
+        "control"
+      ],
+      "minor": [
+        "disruption",
+        "combo",
+        "technical"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "buffy",
+      "name": "Buffy",
+      "set": [
+        "Buffy the Vampire Slayer"
+      ],
+      "foundational_mechanism": "Phasing through opponents",
+      "range": "Reach",
+      "image_url": "/static/pics/buffy.webp",
+      "major": [
+        "adaptive"
+      ],
+      "minor": [
+        "evasion",
+        "burst",
+        "swarm"
+      ],
+      "themes": [
+        "halloween"
+      ]
+    },
+    {
+      "id": "spike",
+      "name": "Spike",
+      "set": [
+        "Buffy the Vampire Slayer"
+      ],
+      "foundational_mechanism": "Shadow token manipulation",
+      "range": "Melee",
+      "image_url": "/static/pics/spike.webp",
+      "major": [
+        "control"
+      ],
+      "minor": [
+        "resource_management",
+        "disruption"
+      ],
+      "themes": [
+        "halloween"
+      ]
+    },
+    {
+      "id": "willow",
+      "name": "Willow",
+      "set": [
+        "Buffy the Vampire Slayer"
+      ],
+      "foundational_mechanism": "Dark Willow threshold trigger",
+      "range": "Ranged",
+      "image_url": "/static/pics/willow.webp",
+      "major": [
+        "stance"
+      ],
+      "minor": [
+        "burst",
+        "scaling",
+        "adaptive"
+      ],
+      "themes": [
+        "halloween"
+      ]
+    },
+    {
+      "id": "angel",
+      "name": "Angel",
+      "set": [
+        "Buffy the Vampire Slayer"
+      ],
+      "foundational_mechanism": "Health recovery and stalling",
+      "range": "Melee",
+      "image_url": "/static/pics/angel.webp",
+      "major": [
+        "attrition"
+      ],
+      "minor": [
+        "rushdown",
+        "control"
+      ],
+      "themes": [
+        "halloween"
+      ]
+    },
+    {
+      "id": "little_red",
+      "name": "Little Red Riding Hood",
+      "set": [
+        "Beowulf vs. Little Red Riding Hood"
+      ],
+      "foundational_mechanism": "Basket symbol matching",
+      "range": "Hybrid",
+      "image_url": "/static/pics/little_red.webp",
+      "major": [
+        "combo"
+      ],
+      "minor": [
+        "resource_management",
+        "technical",
+        "burst"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "beowulf",
+      "name": "Beowulf",
+      "set": [
+        "Beowulf vs. Little Red Riding Hood"
+      ],
+      "foundational_mechanism": "Rage token expenditure",
+      "range": "Melee",
+      "image_url": "/static/pics/beowulf.webp",
+      "major": [
+        "resource_management"
+      ],
+      "minor": [
+        "attrition",
+        "burst"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "deadpool",
+      "name": "Deadpool",
+      "set": [
+        "Deadpool"
+      ],
+      "foundational_mechanism": "Passive restorative healing",
+      "range": "Melee",
+      "image_url": "/static/pics/deadpool.webp",
+      "major": [
+        "rushdown"
+      ],
+      "minor": [
+        "resource_management",
+        "disruption"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "achilles",
+      "name": "Achilles",
+      "set": [
+        "Battle of Legends Vol. 2"
+      ],
+      "foundational_mechanism": "Post-Patroclus berserker buffs",
+      "range": "Melee",
+      "image_url": "/static/pics/achilles.webp",
+      "major": [
+        "scaling"
+      ],
+      "minor": [
+        "rushdown",
+        "burst"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "bloody_mary",
+      "name": "Bloody Mary",
+      "set": [
+        "Battle of Legends Vol. 2"
+      ],
+      "foundational_mechanism": "Hand size strictures",
+      "range": "Melee",
+      "image_url": "/static/pics/bloody_mary.webp",
+      "major": [
+        "resource_management"
+      ],
+      "minor": [
+        "technical",
+        "burst",
+        "combo"
+      ],
+      "themes": [
+        "halloween",
+        "legend"
+      ]
+    },
+    {
+      "id": "sun_wukong",
+      "name": "Sun Wukong",
+      "set": [
+        "Battle of Legends Vol. 2"
+      ],
+      "foundational_mechanism": "Clone summoning via damage",
+      "range": "Melee",
+      "image_url": "/static/pics/sun_wukong.webp",
+      "major": [
+        "swarm"
+      ],
+      "minor": [
+        "evasion",
+        "control"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "yennenga",
+      "name": "Yennenga",
+      "set": [
+        "Battle of Legends Vol. 2"
+      ],
+      "foundational_mechanism": "Damage redirection capabilities",
+      "range": "Ranged",
+      "image_url": "/static/pics/yennenga.webp",
+      "major": [
+        "swarm"
+      ],
+      "minor": [
+        "attrition",
+        "ranged_pressure"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "luke_cage",
+      "name": "Luke Cage",
+      "set": [
+        "Redemption Row"
+      ],
+      "foundational_mechanism": "Passive damage reduction",
+      "range": "Hybrid",
+      "image_url": "/static/pics/luke_cage.webp",
+      "major": [
+        "attrition"
+      ],
+      "minor": [
+        "resource_management",
+        "burst"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "ghost_rider",
+      "name": "Ghost Rider",
+      "set": [
+        "Redemption Row"
+      ],
+      "foundational_mechanism": "Hellfire token expenditure",
+      "range": "Melee",
+      "image_url": "/static/pics/ghost_rider.webp",
+      "major": [
+        "resource_management"
+      ],
+      "minor": [
+        "burst",
+        "rushdown",
+        "evasion"
+      ],
+      "themes": [
+        "superhero",
+        "halloween"
+      ]
+    },
+    {
+      "id": "moon_knight",
+      "name": "Moon Knight",
+      "set": [
+        "Redemption Row"
+      ],
+      "foundational_mechanism": "Forced identity rotation",
+      "range": "Melee",
+      "image_url": "/static/pics/moon_knight.webp",
+      "major": [
+        "stance"
+      ],
+      "minor": [
+        "adaptive",
+        "technical"
+      ],
+      "themes": [
+        "superhero",
+        "halloween"
+      ]
+    },
+    {
+      "id": "daredevil",
+      "name": "Daredevil",
+      "set": [
+        "Hell's Kitchen"
+      ],
+      "foundational_mechanism": "Blind deck boosting gambits",
+      "range": "Melee",
+      "image_url": "/static/pics/daredevil.webp",
+      "major": [
+        "attrition"
+      ],
+      "minor": [
+        "resource_management",
+        "burst",
+        "technical"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "elektra",
+      "name": "Elektra",
+      "set": [
+        "Hell's Kitchen"
+      ],
+      "foundational_mechanism": "Resurrection phase shift",
+      "range": "Melee",
+      "image_url": "/static/pics/elektra.webp",
+      "major": [
+        "scaling"
+      ],
+      "minor": [
+        "stance",
+        "rushdown",
+        "burst"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "bullseye",
+      "name": "Bullseye",
+      "set": [
+        "Hell's Kitchen"
+      ],
+      "foundational_mechanism": "Unlimited range targeting",
+      "range": "Ranged",
+      "image_url": "/static/pics/bullseye.webp",
+      "major": [
+        "ranged_pressure"
+      ],
+      "minor": [
+        "rushdown",
+        "evasion",
+        "burst"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "dr_sattler",
+      "name": "Dr. Sattler",
+      "set": [
+        "Dr. Sattler vs. T-Rex"
+      ],
+      "foundational_mechanism": "Distraction and setup",
+      "range": "Reach",
+      "image_url": "/static/pics/dr_sattler.webp",
+      "major": [
+        "control"
+      ],
+      "minor": [
+        "disruption",
+        "resource_management",
+        "burst"
+      ],
+      "themes": [
+        "film"
+      ]
+    },
+    {
+      "id": "t_rex",
+      "name": "T. Rex",
+      "set": [
+        "Dr. Sattler vs. T-Rex"
+      ],
+      "foundational_mechanism": "Area damage and survivability",
+      "range": "Melee",
+      "image_url": "/static/pics/T_rex.webp",
+      "major": [
+        "rushdown"
+      ],
+      "minor": [
+        "burst",
+        "resource_management",
+        "control"
+      ],
+      "themes": [
+        "monster"
+      ]
+    },
+    {
+      "id": "houdini",
+      "name": "Houdini",
+      "set": [
+        "Houdini vs. The Genie"
+      ],
+      "foundational_mechanism": "Escape and repositioning tricks",
+      "range": "Melee",
+      "image_url": "/static/pics/houdini.webp",
+      "major": [
+        "evasion"
+      ],
+      "minor": [
+        "control",
+        "disruption",
+        "adaptive"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "the_genie",
+      "name": "The Genie",
+      "set": [
+        "Houdini vs. The Genie"
+      ],
+      "foundational_mechanism": "Wish granting versatility",
+      "range": "Ranged",
+      "image_url": "/static/pics/the_genie.webp",
+      "major": [
+        "burst"
+      ],
+      "minor": [
+        "resource_management",
+        "control",
+        "technical"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "ms_marvel",
+      "name": "Ms. Marvel",
+      "set": [
+        "Teen Spirit"
+      ],
+      "foundational_mechanism": "Melee extension distance",
+      "range": "Reach",
+      "image_url": "/static/pics/ms_marvel.webp",
+      "major": [
+        "adaptive"
+      ],
+      "minor": [
+        "evasion",
+        "ranged_pressure"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "squirrel_girl",
+      "name": "Squirrel Girl",
+      "set": [
+        "Teen Spirit"
+      ],
+      "foundational_mechanism": "Micro-sidekick swarming",
+      "range": "Melee",
+      "image_url": "/static/pics/squirrel_girl.webp",
+      "major": [
+        "swarm"
+      ],
+      "minor": [
+        "rushdown",
+        "burst"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "cloak_and_dagger",
+      "name": "Cloak and Dagger",
+      "set": [
+        "Teen Spirit"
+      ],
+      "foundational_mechanism": "Dual-hero positional reliance",
+      "range": "Melee",
+      "image_url": "/static/pics/cloak_and_dagger.webp",
+      "major": [
+        "stance"
+      ],
+      "minor": [
+        "control",
+        "resource_management"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "black_panther",
+      "name": "Black Panther",
+      "set": [
+        "For King and Country"
+      ],
+      "foundational_mechanism": "Storing and returning attacks",
+      "range": "Melee",
+      "image_url": "/static/pics/black_panther.webp",
+      "major": [
+        "resource_management"
+      ],
+      "minor": [
+        "attrition",
+        "burst"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "black_widow",
+      "name": "Black Widow",
+      "set": [
+        "For King and Country"
+      ],
+      "foundational_mechanism": "Completing discrete missions",
+      "range": "Ranged",
+      "image_url": "/static/pics/black_widow.webp",
+      "major": [
+        "combo"
+      ],
+      "minor": [
+        "control",
+        "technical",
+        "disruption"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "winter_soldier",
+      "name": "Winter Soldier",
+      "set": [
+        "For King and Country"
+      ],
+      "foundational_mechanism": "Highly efficient base combat",
+      "range": "Ranged",
+      "image_url": "/static/pics/winter_soldier.webp",
+      "major": [
+        "adaptive"
+      ],
+      "minor": [
+        "rushdown",
+        "ranged_pressure"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "she_hulk",
+      "name": "She-Hulk",
+      "set": [
+        "Brains and Brawn"
+      ],
+      "foundational_mechanism": "Unblockable discard damage",
+      "range": "Melee",
+      "image_url": "/static/pics/she_hulk.webp",
+      "major": [
+        "attrition"
+      ],
+      "minor": [
+        "burst",
+        "disruption"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "spider_man",
+      "name": "Spider-Man",
+      "set": [
+        "Brains and Brawn"
+      ],
+      "foundational_mechanism": "Spider-Sense card revelation",
+      "range": "Reach",
+      "image_url": "/static/pics/spider_man.webp",
+      "major": [
+        "control"
+      ],
+      "minor": [
+        "evasion",
+        "disruption"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "doctor_strange",
+      "name": "Doctor Strange",
+      "set": [
+        "Brains and Brawn"
+      ],
+      "foundational_mechanism": "Health sacrifice for recursion",
+      "range": "Ranged",
+      "image_url": "/static/pics/doctor_strange.webp",
+      "major": [
+        "control"
+      ],
+      "minor": [
+        "resource_management",
+        "ranged_pressure",
+        "burst"
+      ],
+      "themes": [
+        "superhero"
+      ]
+    },
+    {
+      "id": "nikola_tesla",
+      "name": "Nikola Tesla",
+      "set": [
+        "Tales to Amaze"
+      ],
+      "foundational_mechanism": "Coil charging optimization",
+      "range": "Ranged",
+      "image_url": "/static/pics/nikola_tesla.webp",
+      "major": [
+        "resource_management"
+      ],
+      "minor": [
+        "burst",
+        "technical"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "annie_christmas",
+      "name": "Annie Christmas",
+      "set": [
+        "Tales to Amaze"
+      ],
+      "foundational_mechanism": "Health deficit attack buffs",
+      "range": "Hybrid",
+      "image_url": "/static/pics/annie_christmas.webp",
+      "major": [
+        "scaling"
+      ],
+      "minor": [
+        "burst",
+        "rushdown"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "the_golden_bat",
+      "name": "The Golden Bat",
+      "set": [
+        "Tales to Amaze"
+      ],
+      "foundational_mechanism": "Foregoing maneuver for power",
+      "range": "Melee",
+      "image_url": "/static/pics/the_golden_bat.webp",
+      "major": [
+        "rushdown"
+      ],
+      "minor": [
+        "burst",
+        "evasion"
+      ],
+      "themes": [
+        "superhero",
+        "legend"
+      ]
+    },
+    {
+      "id": "dr_jill_trent",
+      "name": "Dr. Jill Trent",
+      "set": [
+        "Tales to Amaze"
+      ],
+      "foundational_mechanism": "Gadget loadout switching",
+      "range": "Melee",
+      "image_url": "/static/pics/dr_jill_trent.webp",
+      "major": [
+        "stance"
+      ],
+      "minor": [
+        "disruption",
+        "adaptive"
+      ],
+      "themes": [
+        "superhero",
+        "legend"
+      ]
+    },
+    {
+      "id": "oda_nobunaga",
+      "name": "Oda Nobunaga",
+      "set": [
+        "Sun's Origin"
+      ],
+      "foundational_mechanism": "Flanking honor guard buffs",
+      "range": "Melee",
+      "image_url": "/static/pics/oda_nobunaga.webp",
+      "major": [
+        "swarm"
+      ],
+      "minor": [
+        "rushdown",
+        "burst"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "tomoe_gozen",
+      "name": "Tomoe Gozen",
+      "set": [
+        "Sun's Origin"
+      ],
+      "foundational_mechanism": "Attack of Opportunity traps",
+      "range": "Ranged",
+      "image_url": "/static/pics/tomoe_gozen.webp",
+      "major": [
+        "control"
+      ],
+      "minor": [
+        "ranged_pressure",
+        "disruption"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "william_shakespeare",
+      "name": "William Shakespeare",
+      "set": [
+        "Slings and Arrows"
+      ],
+      "foundational_mechanism": "Syllable matching mechanics",
+      "range": "Melee",
+      "image_url": "/static/pics/william_shakespeare.webp",
+      "major": [
+        "combo"
+      ],
+      "minor": [
+        "technical",
+        "resource_management"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "hamlet",
+      "name": "Hamlet",
+      "set": [
+        "Slings and Arrows"
+      ],
+      "foundational_mechanism": "Self-damage for card draw",
+      "range": "Melee",
+      "image_url": "/static/pics/hamlet.webp",
+      "major": [
+        "resource_management"
+      ],
+      "minor": [
+        "stance",
+        "burst"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "titania",
+      "name": "Titania",
+      "set": [
+        "Slings and Arrows"
+      ],
+      "foundational_mechanism": "Hand and movement manipulation",
+      "range": "Melee",
+      "image_url": "/static/pics/titania.webp",
+      "major": [
+        "control"
+      ],
+      "minor": [
+        "adaptive",
+        "ranged_pressure"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "the_wayward_sisters",
+      "name": "The Wayward Sisters",
+      "set": [
+        "Slings and Arrows"
+      ],
+      "foundational_mechanism": "Cauldron ingredient mixing",
+      "range": "Ranged",
+      "image_url": "/static/pics/the_wayward_sisters.webp",
+      "major": [
+        "combo"
+      ],
+      "minor": [
+        "swarm",
+        "resource_management"
+      ],
+      "themes": [
+        "halloween",
+        "legend"
+      ]
+    },
+    {
+      "id": "geralt",
+      "name": "Geralt of Rivia",
+      "set": [
+        "The Witcher: Steel and Silver"
+      ],
+      "foundational_mechanism": "Pre-planning and preparation",
+      "range": "Melee",
+      "image_url": "/static/pics/geralt.webp",
+      "major": [
+        "adaptive"
+      ],
+      "minor": [
+        "technical",
+        "control",
+        "burst"
+      ]
+    },
+    {
+      "id": "ciri",
+      "name": "Ciri",
+      "set": [
+        "The Witcher: Steel and Silver"
+      ],
+      "foundational_mechanism": "Source card accumulation",
+      "range": "Melee",
+      "image_url": "/static/pics/ciri.webp",
+      "major": [
+        "scaling"
+      ],
+      "minor": [
+        "evasion",
+        "burst"
+      ]
+    },
+    {
+      "id": "yennefer_triss",
+      "name": "Yennefer & Triss",
+      "set": [
+        "The Witcher: Realms Fall"
+      ],
+      "foundational_mechanism": "Adaptive magic utility",
+      "range": "Ranged",
+      "image_url": "/static/pics/yennefer_triss.webp",
+      "major": [
+        "control"
+      ],
+      "minor": [
+        "stance",
+        "disruption",
+        "ranged_pressure"
+      ]
+    },
+    {
+      "id": "philippa_eilhart",
+      "name": "Philippa Eilhart",
+      "set": [
+        "The Witcher: Realms Fall"
+      ],
+      "foundational_mechanism": "Blinding and forced discard",
+      "range": "Ranged",
+      "image_url": "/static/pics/philippa_eilhart.webp",
+      "major": [
+        "control"
+      ],
+      "minor": [
+        "disruption",
+        "rushdown"
+      ]
+    },
+    {
+      "id": "eredin",
+      "name": "Eredin Bréacc Glas",
+      "set": [
+        "The Witcher: Realms Fall"
+      ],
+      "foundational_mechanism": "Persistent board presence",
+      "range": "Melee",
+      "image_url": "/static/pics/eredin.webp",
+      "major": [
+        "scaling"
+      ],
+      "minor": [
+        "swarm",
+        "rushdown",
+        "burst"
+      ],
+      "themes": [
+        "monster"
+      ]
+    },
+    {
+      "id": "ancient_leshen",
+      "name": "Ancient Leshen",
+      "set": "The Witcher: Steel and Silver",
+      "foundational_mechanism": "Minion summoning and multi-attack sequencing",
+      "range": "Melee",
+      "image_url": "/static/pics/ancient_leshen.webp",
+      "major": [
+        "swarm"
+      ],
+      "minor": [
+        "control",
+        "attrition",
+        "rushdown"
+      ],
+      "themes": [
+        "monster"
+      ]
+    },
+    {
+      "id": "bruce_lee",
+      "name": "Bruce Lee",
+      "set": "Muhammad Ali vs. Bruce Lee",
+      "foundational_mechanism": "Sequential extra actions",
+      "range": "Melee",
+      "image_url": "/static/pics/bruce_lee.webp",
+      "major": [
+        "combo"
+      ],
+      "minor": [
+        "burst",
+        "evasion",
+        "technical"
+      ],
+      "themes": [
+        "legend"
+      ]
+    },
+    {
+      "id": "muhammad_ali",
+      "name": "Muhammad Ali",
+      "set": [
+        "Muhammad Ali vs. Bruce Lee"
+      ],
+      "foundational_mechanism": "Immediate post-attack mobility",
+      "range": "Melee",
+      "image_url": "/static/pics/muhammad_ali.webp",
+      "major": [
+        "evasion"
+      ],
+      "minor": [
+        "stance",
+        "burst",
+        "control"
+      ],
+      "themes": [
+        "legend"
+      ]
+    }
+  ],
+  "playstyle_definitions": {
+    "major": {
+      "burst": "High damage in short windows",
+      "adaptive": "Can change plan based on matchup/state",
+      "control": "Dictates positioning/pace and constrains opponent",
+      "scaling": "Becomes stronger over time through buildup",
+      "evasion": "Avoids damage through positioning/timing",
+      "rushdown": "Closes distance and pressures aggressively",
+      "combo": "Relies on sequences/synergies for power spikes",
+      "swarm": "Leverages multiple units/tokens for tempo",
+      "attrition": "Wins by outlasting and resource draining",
+      "resource_management": "Turns resources/tokens/cards into sustained advantage",
+      "stance": "Shifts modes/identities for different benefits",
+      "ranged_pressure": "Applies threat primarily from range"
+    },
+    "minor": {
+      "resource_management": "Token/hand/option economy optimization",
+      "combo": "Short tactical lines that chain effects",
+      "rushdown": "Micro-level aggression and chase tools",
+      "stance": "Mode toggles and timing decisions",
+      "disruption": "Interferes with opponent plans/hand/position",
+      "ranged_pressure": "Chip/threat from distance",
+      "swarm": "Sidekick/token tempo plays",
+      "burst": "Finishing windows and damage spikes",
+      "evasion": "Slip, reposition, deny engagement",
+      "technical": "High execution/precision sequencing",
+      "attrition": "Small edges over time, sustain, depletion",
+      "adaptive": "On-the-fly tactical pivots",
+      "control": "Local zoning, traps, board shaping"
+    }
+  }
+}
