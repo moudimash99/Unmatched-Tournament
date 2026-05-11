@@ -1,206 +1,481 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tournament — Pro Bracket</title><style>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unmatched Tournament</title>
+<style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#05070f;--panel:#111827;--panel-2:#0f172a;--line:#334155;--accent:#f97316;--text:#e2e8f0;--muted:#94a3b8;--round-count:6;--round-col-min:230px;--round-gap:2.4rem;--r2-gap:1.45rem;--r3-gap:3.45rem;--qf-gap:8.3rem;--sf-gap:20rem}
-@media (max-width:1600px){:root{--round-col-min:200px;--round-gap:1.5rem;--r2-gap:1.2rem;--r3-gap:2.95rem;--qf-gap:7.4rem;--sf-gap:18rem}}
-@media (max-width:1200px){:root{--round-col-min:175px;--round-gap:.95rem;--r2-gap:1rem;--r3-gap:2.25rem;--qf-gap:5.8rem;--sf-gap:15rem}.round-title{font-size:.66rem;letter-spacing:.14em}.mc{padding:.56rem .62rem}}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(circle at top,#172554 0%,#05070f 45%);color:var(--text);min-height:100vh}
-header{padding:1.2rem 1.2rem .9rem;border-bottom:1px solid #1e293b;background:linear-gradient(120deg,#111827,#0b1220 70%)}
-h1{font-size:1.55rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#f8fafc;text-align:center}
-.mode-label{display:block;font-size:.72rem;color:#f97316;letter-spacing:.22em;margin-bottom:.3rem;text-align:center}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0b1120;color:#e2e8f0;min-height:100vh}
 
-.sb{display:flex;justify-content:center;align-items:stretch;margin:.9rem auto 0;max-width:360px;border-radius:14px;overflow:hidden;border:2px solid #334155;background:#0b1220}
-.panel{flex:1;padding:.7rem .9rem;text-align:center;transition:background .2s}
-.panel.lead{background:#1e3a8a3b}
-.ptag{font-size:.58rem;color:#64748b;text-transform:uppercase;letter-spacing:.1em}
-.pname{font-size:.84rem;font-weight:700;margin:.08rem 0}
-.pscore{font-size:2rem;font-weight:900;line-height:1.1}
+/* ── Header ── */
+header{position:sticky;top:0;z-index:100;background:#111827;border-bottom:2px solid #1e293b;padding:.9rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.header-title{font-size:1.2rem;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
+.header-title span{color:#e2e8f0;font-weight:400;font-size:.75rem;display:block;letter-spacing:.04em;text-transform:none;margin-top:.1rem}
+.sb{display:flex;align-items:center;gap:.5rem}
+.panel{text-align:center;padding:.4rem .9rem;background:#1e293b;border-radius:10px;border:1px solid #334155;min-width:80px;transition:background .2s,border-color .2s}
+.panel.lead{background:#1c3460;border-color:#3b82f6}
+.ptag{font-size:.55rem;color:#64748b;text-transform:uppercase;letter-spacing:.1em}
+.pname{font-size:.8rem;font-weight:700;margin:.05rem 0}
+.pscore{font-size:1.8rem;font-weight:900;line-height:1}
 .p1c{color:#60a5fa}.p2c{color:#fb923c}
-.sb-vs{display:flex;align-items:center;padding:0 .45rem;color:#64748b;font-size:.58rem;font-weight:800}
-.reset-btn{display:block;margin:.34rem auto 0;font-size:.66rem;color:#94a3b8;background:none;border:1px solid #334155;border-radius:999px;padding:.16rem .62rem;cursor:pointer}
+.sb-vs{font-size:.65rem;font-weight:800;color:#475569}
+.reset-btn{font-size:.65rem;color:#94a3b8;background:none;border:1px solid #334155;border-radius:999px;padding:.22rem .7rem;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s}
 .reset-btn:hover{color:#ef4444;border-color:#ef4444}
 
-main{padding:1.2rem}
-.board-shell{background:linear-gradient(160deg,#0b1220,#060a14);border:1px solid #1e293b;border-radius:18px;padding:1.1rem;overflow:auto;scrollbar-gutter:stable both-edges;box-shadow:0 20px 40px rgba(0,0,0,.35)}
-.board-shell:focus-visible{outline:2px solid #f97316;outline-offset:2px}
-.scroll-hint{font-size:.65rem;color:#94a3b8;letter-spacing:.08em;text-transform:uppercase;margin:0 0 .75rem .15rem}
-.board{display:grid;grid-template-columns:repeat(var(--round-count),minmax(var(--round-col-min),1fr));gap:var(--round-gap);min-width:calc(var(--round-count) * var(--round-col-min) + (var(--round-count) - 1) * var(--round-gap));padding-right:.9rem;position:relative}
-.round-col{position:relative}
-.round-title{font-size:.72rem;color:#f97316;font-weight:800;text-transform:uppercase;letter-spacing:.18em;margin-bottom:.75rem;text-align:center}
-.round-stack{display:flex;flex-direction:column;position:relative}
-.round-col:not(.round-r1) .round-stack::before{content:"";position:absolute;left:-1.2rem;top:.6rem;bottom:.6rem;width:2px;background:linear-gradient(180deg,#1d4ed8,#334155)}
+/* ── Round tabs ── */
+.nav-wrap{background:#111827;border-bottom:1px solid #1e293b;overflow-x:auto;scrollbar-width:none}
+.nav-wrap::-webkit-scrollbar{display:none}
+.nav{display:flex;gap:0;padding:.5rem 1rem;min-width:max-content}
+.tab{padding:.45rem 1rem;border-radius:8px;font-size:.78rem;font-weight:600;color:#94a3b8;cursor:pointer;transition:background .15s,color .15s;border:none;background:none;white-space:nowrap;position:relative}
+.tab:hover{color:#e2e8f0;background:#1e293b}
+.tab.active{color:#f59e0b;background:#1e293b}
+.tab.active::after{content:"";position:absolute;bottom:-8px;left:10%;right:10%;height:2px;background:#f59e0b;border-radius:2px}
+.tab-badge{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;font-size:.55rem;font-weight:800;margin-left:.35rem;vertical-align:middle}
+.tab-badge.done{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
+.tab-badge.partial{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
+.tab-badge.empty{background:#1e293b;color:#64748b;border:1px solid #2d3748}
 
-.mc{background:linear-gradient(160deg,#1f2937,#111827);border:1px solid #334155;border-radius:12px;padding:.64rem .76rem;transition:box-shadow .2s,border-color .2s;position:relative}
-.mc:hover{box-shadow:0 8px 18px rgba(0,0,0,.36);border-color:#475569}
-.round-col:not(.round-final) .mc::after{content:"";position:absolute;right:-1.2rem;top:50%;width:1.2rem;height:2px;background:linear-gradient(90deg,#334155,#1d4ed8)}
-.round-col:not(.round-r1) .mc::before{content:"";position:absolute;left:-1.2rem;top:50%;width:1.2rem;height:2px;background:linear-gradient(90deg,#1d4ed8,#334155)}
-.mc.done{border-color:#22c55e66}
-.mc.picking{border-color:#f59e0b88}
-.mc.denied{border-color:#ef444477;background:#7f1d1d22}
-.mc.dim{opacity:.56}
-.lrow{display:flex;align-items:center;gap:.22rem;flex-wrap:wrap;margin-bottom:.35rem}
-.ltext{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#94a3b8}
-.sc-b{font-size:.54rem;padding:.05rem .26rem;border-radius:999px;font-weight:700}
-.done-b{font-size:.54rem;padding:.05rem .26rem;border-radius:999px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;font-weight:700}
-.mf-name{font-size:.8rem;font-weight:600;line-height:1.3;display:flex;align-items:baseline;flex-wrap:wrap;gap:.18rem}
-.mf-name.won{color:#fbbf24}.mf-name.lost{color:#64748b;text-decoration:line-through}
-.mf-name.tbd{color:#94a3b8;font-style:italic;font-size:.72rem}
-.mf-name.possible{flex-direction:column;align-items:flex-start;gap:.1rem}
-.poss-label{font-size:.55rem;color:#64748b;font-style:normal;font-weight:600}
-.poss-chip{font-size:.68rem;color:#cbd5e1;font-style:normal;display:inline-flex;align-items:center;gap:.16rem}
-.vs-txt{font-size:.52rem;font-weight:800;color:#64748b;letter-spacing:.1em;padding:.04rem 0}
-.tb{font-size:.5rem;padding:.04rem .22rem;border-radius:3px;font-weight:800;flex-shrink:0}
-.win-btns{display:grid;grid-template-columns:1fr 1fr;gap:.28rem;margin-top:.35rem}
-.win-btn{padding:.31rem .2rem;border-radius:7px;border:1.5px solid #475569;background:#0b1220;color:#e2e8f0;font-size:.67rem;font-weight:600;cursor:pointer;line-height:1.2}
-.win-btn:hover{border-color:#f97316;background:#1e293b}
-.pick-label{font-size:.62rem;color:#cbd5e1;margin:.38rem 0 .24rem;text-align:center}
-.player-btns{display:grid;grid-template-columns:1fr 1fr;gap:.28rem}
-.pb-p1,.pb-p2{padding:.28rem;border-radius:5px;border:none;color:#fff;font-size:.68rem;font-weight:700;cursor:pointer}
+/* ── Main content ── */
+main{padding:1.5rem;max-width:1400px;margin:0 auto}
+
+/* ── Round panel ── */
+.round-panel{display:none}
+.round-panel.active{display:block}
+.round-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+.round-title{font-size:1rem;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:.5rem}
+.round-progress{font-size:.72rem;color:#64748b;font-weight:400}
+
+/* ── Match grid ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:.85rem}
+
+/* ── Match card ── */
+.mc{background:#161f30;border:1px solid #1e293b;border-radius:12px;padding:.9rem 1rem;transition:box-shadow .2s,border-color .2s}
+.mc:not(.dim):hover{box-shadow:0 4px 20px rgba(0,0,0,.4);border-color:#334155}
+.mc.done{border-color:#22c55e55;background:#0d1f17}
+.mc.picking{border-color:#f59e0b66;background:#1a1708}
+.mc.denied{border-color:#ef444455;background:#1f0d0d}
+.mc.dim{opacity:.45;pointer-events:none}
+
+/* label row */
+.lrow{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;margin-bottom:.55rem}
+.ltext{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#475569}
+.sc-b{font-size:.58rem;padding:.06rem .3rem;border-radius:999px;font-weight:700}
+.done-b{font-size:.58rem;padding:.06rem .3rem;border-radius:999px;background:#22c55e1a;color:#22c55e;border:1px solid #22c55e33;font-weight:700}
+
+/* fighters */
+.fighter{display:flex;align-items:center;gap:.45rem;padding:.42rem .55rem;border-radius:8px;transition:background .1s}
+.fighter.top-f{background:#1e293b33}
+.fighter.bot-f{background:#1e293b33}
+.fighter.won-f{background:#1a2e0d}
+.fighter.lost-f{opacity:.45}
+.f-name{font-size:.9rem;font-weight:600;flex:1;line-height:1.25}
+.f-name.won{color:#86efac}
+.f-name.lost{text-decoration:line-through;color:#475569}
+.f-name.tbd{color:#64748b;font-style:italic;font-size:.78rem}
+.crown{color:#f59e0b;font-size:.9rem}
+.tb{font-size:.55rem;padding:.06rem .25rem;border-radius:4px;font-weight:800;flex-shrink:0}
+.vs-row{text-align:center;font-size:.58rem;font-weight:800;color:#334155;letter-spacing:.12em;padding:.18rem 0}
+.fighters-wrap{margin-bottom:.55rem}
+
+/* fairness bar */
+.fbar-wrap{height:3px;background:#1e293b;border-radius:2px;overflow:hidden;margin-bottom:.2rem}
+.fbar-fill{height:100%;border-radius:2px;transition:width .4s}
+.fbar-pct{font-size:.58rem;color:#475569;text-align:right;margin-bottom:.4rem}
+
+/* win buttons */
+.win-btns{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.45rem}
+.win-btn{padding:.45rem .3rem;border-radius:8px;border:1.5px solid #334155;background:#0b1120;color:#cbd5e1;font-size:.78rem;font-weight:600;cursor:pointer;text-align:center;line-height:1.25;transition:border-color .15s,background .15s,color .15s}
+.win-btn:hover{border-color:#f59e0b;background:#1a1708;color:#fef3c7}
+
+/* player pick */
+.pick-label{font-size:.72rem;color:#94a3b8;margin:.45rem 0 .3rem;text-align:center}
+.player-btns{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.pb-p1,.pb-p2{padding:.38rem;border-radius:7px;border:none;color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;transition:opacity .15s}
 .pb-p1{background:#3b82f6}.pb-p2{background:#f97316}
-.pb-p1:hover,.pb-p2:hover{opacity:.88}
-.result-row{display:flex;align-items:center;justify-content:space-between;margin-top:.26rem}
-.player-tag{font-size:.65rem;font-weight:700}
-.undo-btn{font-size:.56rem;color:#94a3b8;background:none;border:1px solid #334155;border-radius:5px;padding:.12rem .38rem;cursor:pointer}
+.pb-p1:hover,.pb-p2:hover{opacity:.85}
+
+/* result row */
+.result-row{display:flex;align-items:center;justify-content:space-between;margin-top:.4rem;gap:.5rem}
+.player-tag{font-size:.72rem;font-weight:700}
+.undo-btn{font-size:.62rem;color:#475569;background:none;border:1px solid #2d3748;border-radius:5px;padding:.14rem .48rem;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap}
 .undo-btn:hover{color:#ef4444;border-color:#ef4444}
-.fbar-wrap{margin-top:.3rem;height:3px;background:#1e3a5f;border-radius:2px;overflow:hidden}
-.fbar-fill{height:100%;border-radius:2px}
-.fbar-pct{font-size:.53rem;color:#94a3b8;margin-top:.12rem;text-align:right}
 
-.round-r1 .round-stack{gap:.65rem}
-.round-r2 .round-stack{gap:var(--r2-gap);padding-top:1.2rem}
-.round-r3 .round-stack{gap:var(--r3-gap);padding-top:2.7rem}
-.round-qf .round-stack{gap:var(--qf-gap);padding-top:6rem}
-.round-sf .round-stack{gap:var(--sf-gap);padding-top:13.5rem}
-.round-final .round-stack{padding-top:24rem}
+/* byes panel */
+.bye-grid{display:flex;flex-wrap:wrap;gap:.45rem}
+.bye-chip{display:flex;align-items:center;gap:.3rem;background:#161f30;border:1px solid #1e293b;border-radius:999px;padding:.3rem .8rem;font-size:.8rem;color:#cbd5e1}
 
-.bye-panel{margin-top:1rem;background:#0b1220;border:1px solid #1e293b;border-radius:14px;padding:.9rem}
-.bye-title{font-size:.72rem;color:#f97316;font-weight:800;text-transform:uppercase;letter-spacing:.14em;margin-bottom:.65rem}
-.bye-list{display:flex;flex-wrap:wrap;gap:.3rem}
-.bye-chip{background:#1f2937;border:1px solid #334155;border-radius:999px;padding:.16rem .55rem;font-size:.7rem;color:#cbd5e1;display:flex;align-items:center;gap:.2rem}
-footer{text-align:center;color:#475569;font-size:.62rem;padding:.75rem;margin-top:.2rem}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-</style></head><body>
+/* possible fighters */
+.poss-list{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.2rem}
+.poss-chip{font-size:.68rem;color:#94a3b8;display:inline-flex;align-items:center;gap:.18rem;background:#1e293b44;border-radius:4px;padding:.1rem .3rem}
+
+footer{text-align:center;color:#334155;font-size:.62rem;padding:1.5rem;margin-top:1rem;border-top:1px solid #161f30}
+</style>
+</head>
+<body>
+
 <header>
-  <span class="mode-label">PRO BRACKET MODE</span>
-  <h1>⚔ Unmatched Tournament</h1>
+  <div class="header-title">⚔ Unmatched Tournament<span>Ahmad vs Mohammad</span></div>
   <div class="sb">
-    <div class="panel" id="p1panel"><div class="ptag">P1</div><div class="pname">Ahmad</div><div class="pscore p1c" id="p1score">0</div></div>
-    <div class="sb-vs">VS</div>
-    <div class="panel" id="p2panel"><div class="ptag">P2</div><div class="pname">Mohammad</div><div class="pscore p2c" id="p2score">0</div></div>
-  </div>
-  <button class="reset-btn" onclick="resetAll()">↺ reset</button>
-</header>
-<main>
-  <section class="board-shell" tabindex="0" role="region" aria-label="Tournament bracket" aria-describedby="bracket-desc">
-    <p id="bracket-desc" class="sr-only">Tournament rounds are arranged from left to right. Connector lines are visual guides only.</p>
-    <p class="scroll-hint">Scroll horizontally to follow each round →</p>
-    <div class="board">
-      <div class="round-col round-r1">
-        <h2 class="round-title">Round 1</h2>
-        <div class="round-stack"><div id="mc-r1_1" class="mc"></div><div id="mc-r1_2" class="mc"></div><div id="mc-r1_3" class="mc"></div><div id="mc-r1_4" class="mc"></div><div id="mc-r1_5" class="mc"></div><div id="mc-r1_6" class="mc"></div><div id="mc-r1_7" class="mc"></div><div id="mc-r1_8" class="mc"></div><div id="mc-r1_9" class="mc"></div><div id="mc-r1_10" class="mc"></div><div id="mc-r1_11" class="mc"></div><div id="mc-r1_12" class="mc"></div><div id="mc-r1_13" class="mc"></div><div id="mc-r1_14" class="mc"></div><div id="mc-r1_15" class="mc"></div></div>
-      </div>
-      <div class="round-col round-r2">
-        <h2 class="round-title">Round 2</h2>
-        <div class="round-stack"><div id="mc-r2_1" class="mc"></div><div id="mc-r2_2" class="mc"></div><div id="mc-r2_3" class="mc"></div><div id="mc-r2_4" class="mc"></div><div id="mc-r2_5" class="mc"></div><div id="mc-r2_6" class="mc"></div><div id="mc-r2_7" class="mc"></div><div id="mc-r2_8" class="mc"></div><div id="mc-r2_9" class="mc"></div><div id="mc-r2_10" class="mc"></div><div id="mc-r2_11" class="mc"></div><div id="mc-r2_12" class="mc"></div><div id="mc-r2_13" class="mc"></div><div id="mc-r2_14" class="mc"></div><div id="mc-r2_15" class="mc"></div><div id="mc-r2_16" class="mc"></div></div>
-      </div>
-      <div class="round-col round-r3">
-        <h2 class="round-title">Round of 16</h2>
-        <div class="round-stack"><div id="mc-r3_1" class="mc"></div><div id="mc-r3_2" class="mc"></div><div id="mc-r3_3" class="mc"></div><div id="mc-r3_4" class="mc"></div><div id="mc-r3_5" class="mc"></div><div id="mc-r3_6" class="mc"></div><div id="mc-r3_7" class="mc"></div><div id="mc-r3_8" class="mc"></div></div>
-      </div>
-      <div class="round-col round-qf">
-        <h2 class="round-title">Quarter-Finals</h2>
-        <div class="round-stack"><div id="mc-qf_1" class="mc"></div><div id="mc-qf_2" class="mc"></div><div id="mc-qf_3" class="mc"></div><div id="mc-qf_4" class="mc"></div></div>
-      </div>
-      <div class="round-col round-sf">
-        <h2 class="round-title">Semi-Finals</h2>
-        <div class="round-stack"><div id="mc-sf_1" class="mc"></div><div id="mc-sf_2" class="mc"></div></div>
-      </div>
-      <div class="round-col round-final">
-        <h2 class="round-title">Final</h2>
-        <div class="round-stack"><div id="mc-final" class="mc"></div></div>
-      </div>
+    <div class="panel" id="p1panel">
+      <div class="ptag">P1</div>
+      <div class="pname">Ahmad</div>
+      <div class="pscore p1c" id="p1score">0</div>
     </div>
-  </section>
-  <section class="bye-panel"><h2 class="bye-title">Byes to Round 2</h2><div class="bye-list"><div class="bye-chip"><span class="tb" style="background:#3b82f6;color:#fff">B</span> Dracula</div><div class="bye-chip"><span class="tb" style="background:#f59e0b;color:#000">S</span> Elektra</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Eredin Breacc Glas</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Ghost Rider</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Jekyll & Hyde</div><div class="bye-chip"><span class="tb" style="background:#94a3b8;color:#fff">D</span> King Arthur</div><div class="bye-chip"><span class="tb" style="background:#22c55e;color:#000">A</span> Little Red Riding Hood</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Luke Cage</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Moon Knight</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Ms. Marvel</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Raptors</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Robert Muldoon</div><div class="bye-chip"><span class="tb" style="background:#f59e0b;color:#000">S</span> Sherlock Holmes</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Squirrel Girl</div><div class="bye-chip"><span class="tb" style="background:#3b82f6;color:#fff">B</span> The Golden Bat</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Yennefer & Triss</div><div class="bye-chip"><span class="tb" style="background:#f97316;color:#000">A+</span> Yennenga</div></div></section>
+    <div class="sb-vs">VS</div>
+    <div class="panel" id="p2panel">
+      <div class="ptag">P2</div>
+      <div class="pname">Mohammad</div>
+      <div class="pscore p2c" id="p2score">0</div>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">↺ reset</button>
+  </div>
+</header>
+
+<nav class="nav-wrap">
+  <div class="nav" id="nav-tabs">
+    <button class="tab active" onclick="showTab('r1')" id="tab-r1">Round 1 <span class="tab-badge empty" id="badge-r1">15</span></button>
+    <button class="tab" onclick="showTab('r2')" id="tab-r2">Round 2 <span class="tab-badge empty" id="badge-r2">16</span></button>
+    <button class="tab" onclick="showTab('r3')" id="tab-r3">Round of 16 <span class="tab-badge empty" id="badge-r3">8</span></button>
+    <button class="tab" onclick="showTab('qf')" id="tab-qf">Quarter-Finals <span class="tab-badge empty" id="badge-qf">4</span></button>
+    <button class="tab" onclick="showTab('sf')" id="tab-sf">Semi-Finals <span class="tab-badge empty" id="badge-sf">2</span></button>
+    <button class="tab" onclick="showTab('final')" id="tab-final">Final <span class="tab-badge empty" id="badge-final">1</span></button>
+    <button class="tab" onclick="showTab('byes')" id="tab-byes">Byes <span class="tab-badge empty" id="badge-byes">17</span></button>
+  </div>
+</nav>
+
+<main>
+
+  <div class="round-panel active" id="panel-r1">
+    <div class="round-header">
+      <div class="round-title">Round 1 <span class="round-progress" id="prog-r1"></span></div>
+    </div>
+    <div class="grid" id="grid-r1">
+      <div id="mc-r1_1" class="mc"></div>
+      <div id="mc-r1_2" class="mc"></div>
+      <div id="mc-r1_3" class="mc"></div>
+      <div id="mc-r1_4" class="mc"></div>
+      <div id="mc-r1_5" class="mc"></div>
+      <div id="mc-r1_6" class="mc"></div>
+      <div id="mc-r1_7" class="mc"></div>
+      <div id="mc-r1_8" class="mc"></div>
+      <div id="mc-r1_9" class="mc"></div>
+      <div id="mc-r1_10" class="mc"></div>
+      <div id="mc-r1_11" class="mc"></div>
+      <div id="mc-r1_12" class="mc"></div>
+      <div id="mc-r1_13" class="mc"></div>
+      <div id="mc-r1_14" class="mc"></div>
+      <div id="mc-r1_15" class="mc"></div>
+    </div>
+  </div>
+
+  <div class="round-panel" id="panel-r2">
+    <div class="round-header">
+      <div class="round-title">Round 2 <span class="round-progress" id="prog-r2"></span></div>
+    </div>
+    <div class="grid" id="grid-r2">
+      <div id="mc-r2_1" class="mc"></div>
+      <div id="mc-r2_2" class="mc"></div>
+      <div id="mc-r2_3" class="mc"></div>
+      <div id="mc-r2_4" class="mc"></div>
+      <div id="mc-r2_5" class="mc"></div>
+      <div id="mc-r2_6" class="mc"></div>
+      <div id="mc-r2_7" class="mc"></div>
+      <div id="mc-r2_8" class="mc"></div>
+      <div id="mc-r2_9" class="mc"></div>
+      <div id="mc-r2_10" class="mc"></div>
+      <div id="mc-r2_11" class="mc"></div>
+      <div id="mc-r2_12" class="mc"></div>
+      <div id="mc-r2_13" class="mc"></div>
+      <div id="mc-r2_14" class="mc"></div>
+      <div id="mc-r2_15" class="mc"></div>
+      <div id="mc-r2_16" class="mc"></div>
+    </div>
+  </div>
+
+  <div class="round-panel" id="panel-r3">
+    <div class="round-header">
+      <div class="round-title">Round of 16 <span class="round-progress" id="prog-r3"></span></div>
+    </div>
+    <div class="grid" id="grid-r3">
+      <div id="mc-r3_1" class="mc"></div>
+      <div id="mc-r3_2" class="mc"></div>
+      <div id="mc-r3_3" class="mc"></div>
+      <div id="mc-r3_4" class="mc"></div>
+      <div id="mc-r3_5" class="mc"></div>
+      <div id="mc-r3_6" class="mc"></div>
+      <div id="mc-r3_7" class="mc"></div>
+      <div id="mc-r3_8" class="mc"></div>
+    </div>
+  </div>
+
+  <div class="round-panel" id="panel-qf">
+    <div class="round-header">
+      <div class="round-title">Quarter-Finals <span class="round-progress" id="prog-qf"></span></div>
+    </div>
+    <div class="grid" id="grid-qf">
+      <div id="mc-qf_1" class="mc"></div>
+      <div id="mc-qf_2" class="mc"></div>
+      <div id="mc-qf_3" class="mc"></div>
+      <div id="mc-qf_4" class="mc"></div>
+    </div>
+  </div>
+
+  <div class="round-panel" id="panel-sf">
+    <div class="round-header">
+      <div class="round-title">Semi-Finals <span class="round-progress" id="prog-sf"></span></div>
+    </div>
+    <div class="grid" id="grid-sf">
+      <div id="mc-sf_1" class="mc"></div>
+      <div id="mc-sf_2" class="mc"></div>
+    </div>
+  </div>
+
+  <div class="round-panel" id="panel-final">
+    <div class="round-header">
+      <div class="round-title">⚔ The Final</div>
+    </div>
+    <div class="grid" style="grid-template-columns:minmax(270px,480px)" id="grid-final">
+      <div id="mc-final" class="mc"></div>
+    </div>
+  </div>
+
+  <div class="round-panel" id="panel-byes">
+    <div class="round-header">
+      <div class="round-title">Byes to Round 2 <span class="round-progress">17 fighters</span></div>
+    </div>
+    <div class="bye-grid"><div class="bye-chip"><span class="tb" style="background:#3b82f6;color:#fff">B</span> Dracula</div><div class="bye-chip"><span class="tb" style="background:#f59e0b;color:#000">S</span> Elektra</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Eredin Breacc Glas</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Ghost Rider</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Jekyll &amp; Hyde</div><div class="bye-chip"><span class="tb" style="background:#94a3b8;color:#fff">D</span> King Arthur</div><div class="bye-chip"><span class="tb" style="background:#22c55e;color:#000">A</span> Little Red Riding Hood</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Luke Cage</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Moon Knight</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Ms. Marvel</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Raptors</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Robert Muldoon</div><div class="bye-chip"><span class="tb" style="background:#f59e0b;color:#000">S</span> Sherlock Holmes</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Squirrel Girl</div><div class="bye-chip"><span class="tb" style="background:#3b82f6;color:#fff">B</span> The Golden Bat</div><div class="bye-chip"><span class="tb" style="background:#06b6d4;color:#fff">C</span> Yennefer &amp; Triss</div><div class="bye-chip"><span class="tb" style="background:#f97316;color:#000">A+</span> Yennenga</div></div>
+  </div>
+
 </main>
-<footer>Bracket connectors are visual guides; all matchup logic is unchanged.</footer>
+
+<footer>Fairness scoring: exp(−0.04×dev²) · Hard cutoff ±5% · 20% tier diversity · SA optimised R2–R6</footer>
+
 <script>
 const BK = {"r1_1": {"id": "r1_1", "label": "Match 1", "round": 1, "top": {"type": "known", "id": "bullseye", "name": "Bullseye", "tier": "A", "tc": "#22c55e"}, "bot": {"type": "known", "id": "spider_man", "name": "Spider-Man", "tier": "B", "tc": "#3b82f6"}, "preset_winner": "bullseye", "meta": {"wp": null, "wp_b": null, "score": null, "tier_diff": 1, "denied": false}}, "r1_2": {"id": "r1_2", "label": "Match 2", "round": 1, "top": {"type": "known", "id": "robin_hood", "name": "Robin Hood", "tier": "A", "tc": "#22c55e"}, "bot": {"type": "known", "id": "achilles", "name": "Achilles", "tier": "S", "tc": "#f59e0b"}, "preset_winner": "robin_hood", "meta": {"wp": null, "wp_b": null, "score": null, "tier_diff": 2, "denied": false}}, "r1_3": {"id": "r1_3", "label": "Match 3", "round": 1, "top": {"type": "known", "id": "dr_sattler", "name": "Dr. Sattler", "tier": "D", "tc": "#94a3b8"}, "bot": {"type": "known", "id": "winter_soldier", "name": "Winter Soldier", "tier": "B", "tc": "#3b82f6"}, "preset_winner": null, "meta": {"wp": 50.0, "wp_b": 50.0, "score": 1.0, "tier_diff": 2, "denied": false}}, "r1_4": {"id": "r1_4", "label": "Match 4", "round": 1, "top": {"type": "known", "id": "bigfoot", "name": "Bigfoot", "tier": "A+", "tc": "#f97316"}, "bot": {"type": "known", "id": "she_hulk", "name": "She-Hulk", "tier": "B", "tc": "#3b82f6"}, "preset_winner": null, "meta": {"wp": 50.0, "wp_b": 50.0, "score": 1.0, "tier_diff": 2, "denied": false}}, "r1_5": {"id": "r1_5", "label": "Match 5", "round": 1, "top": {"type": "known", "id": "daredevil", "name": "Daredevil", "tier": "A", "tc": "#22c55e"}, "bot": {"type": "known", "id": "philippa_eilhart", "name": "Philippa Eilhart", "tier": "C", "tc": "#06b6d4"}, "preset_winner": null, "meta": {"wp": 50.2, "wp_b": 49.8, "score": 0.999, "tier_diff": 2, "denied": false}}, "r1_6": {"id": "r1_6", "label": "Match 6", "round": 1, "top": {"type": "known", "id": "black_panther", "name": "Black Panther", "tier": "C", "tc": "#06b6d4"}, "bot": {"type": "known", "id": "geralt", "name": "Geralt of Rivia", "tier": "A", "tc": "#22c55e"}, "preset_winner": null, "meta": {"wp": 50.2, "wp_b": 49.8, "score": 0.999, "tier_diff": 2, "denied": false}}, "r1_7": {"id": "r1_7", "label": "Match 7", "round": 1, "top": {"type": "known", "id": "sinbad", "name": "Sinbad", "tier": "A", "tc": "#22c55e"}, "bot": {"type": "known", "id": "cloak_and_dagger", "name": "Cloak and Dagger", "tier": "C", "tc": "#06b6d4"}, "preset_winner": null, "meta": {"wp": 50.2, "wp_b": 49.8, "score": 0.998, "tier_diff": 2, "denied": false}}, "r1_8": {"id": "r1_8", "label": "Match 8", "round": 1, "top": {"type": "known", "id": "sun_wukong", "name": "Sun Wukong", "tier": "A+", "tc": "#f97316"}, "bot": {"type": "known", "id": "black_widow", "name": "Black Widow", "tier": "B", "tc": "#3b82f6"}, "preset_winner": null, "meta": {"wp": 48.7, "wp_b": 51.3, "score": 0.948, "tier_diff": 2, "denied": false}}, "r1_9": {"id": "r1_9", "label": "Match 9", "round": 1, "top": {"type": "known", "id": "invisible_man", "name": "The Invisible Man", "tier": "C", "tc": "#06b6d4"}, "bot": {"type": "known", "id": "ancient_leshen", "name": "Ancient Leshen", "tier": "A+", "tc": "#f97316"}, "preset_winner": null, "meta": {"wp": 50.0, "wp_b": 50.0, "score": 0.9, "tier_diff": 3, "denied": false}}, "r1_10": {"id": "r1_10", "label": "Match 10", "round": 1, "top": {"type": "known", "id": "alice", "name": "Alice", "tier": "B", "tc": "#3b82f6"}, "bot": {"type": "known", "id": "doctor_strange", "name": "Doctor Strange", "tier": "C", "tc": "#06b6d4"}, "preset_winner": null, "meta": {"wp": 50.0, "wp_b": 50.0, "score": 0.9, "tier_diff": 1, "denied": false}}, "r1_11": {"id": "r1_11", "label": "Match 11", "round": 1, "top": {"type": "known", "id": "the_genie", "name": "The Genie", "tier": "C", "tc": "#06b6d4"}, "bot": {"type": "known", "id": "annie_christmas", "name": "Annie Christmas", "tier": "B", "tc": "#3b82f6"}, "preset_winner": null, "meta": {"wp": 50.2, "wp_b": 49.8, "score": 0.898, "tier_diff": 1, "denied": false}}, "r1_12": {"id": "r1_12", "label": "Match 12", "round": 1, "top": {"type": "known", "id": "t_rex", "name": "T. Rex", "tier": "B", "tc": "#3b82f6"}, "bot": {"type": "known", "id": "ciri", "name": "Ciri", "tier": "S", "tc": "#f59e0b"}, "preset_winner": null, "meta": {"wp": 50.4, "wp_b": 49.6, "score": 0.895, "tier_diff": 3, "denied": false}}, "r1_13": {"id": "r1_13", "label": "Match 13", "round": 1, "top": {"type": "known", "id": "houdini", "name": "Houdini", "tier": "C", "tc": "#06b6d4"}, "bot": {"type": "known", "id": "dr_jill_trent", "name": "Dr. Jill Trent", "tier": "B", "tc": "#3b82f6"}, "preset_winner": null, "meta": {"wp": 50.7, "wp_b": 49.3, "score": 0.885, "tier_diff": 1, "denied": false}}, "r1_14": {"id": "r1_14", "label": "Match 14", "round": 1, "top": {"type": "known", "id": "beowulf", "name": "Beowulf", "tier": "D", "tc": "#94a3b8"}, "bot": {"type": "known", "id": "bloody_mary", "name": "Bloody Mary", "tier": "B", "tc": "#3b82f6"}, "preset_winner": null, "meta": {"wp": 52.0, "wp_b": 48.0, "score": 0.883, "tier_diff": 2, "denied": false}}, "r1_15": {"id": "r1_15", "label": "Match 15", "round": 1, "top": {"type": "known", "id": "medusa", "name": "Medusa", "tier": "S", "tc": "#f59e0b"}, "bot": {"type": "known", "id": "nikola_tesla", "name": "Nikola Tesla", "tier": "B", "tc": "#3b82f6"}, "preset_winner": null, "meta": {"wp": 48.9, "wp_b": 51.1, "score": 0.859, "tier_diff": 3, "denied": false}}, "r2_1": {"id": "r2_1", "label": "R2-1", "round": 2, "top": {"type": "from_match", "src": "r1_2"}, "bot": {"type": "from_match", "src": "r1_7"}, "preset_winner": null, "meta": null}, "r2_2": {"id": "r2_2", "label": "R2-2", "round": 2, "top": {"type": "from_match", "src": "r1_3"}, "bot": {"type": "from_match", "src": "r1_8"}, "preset_winner": null, "meta": null}, "r2_3": {"id": "r2_3", "label": "R2-3", "round": 2, "top": {"type": "from_match", "src": "r1_15"}, "bot": {"type": "known", "id": "the_golden_bat", "name": "The Golden Bat", "tier": "B", "tc": "#3b82f6"}, "preset_winner": null, "meta": null}, "r2_4": {"id": "r2_4", "label": "R2-4", "round": 2, "top": {"type": "from_match", "src": "r1_4"}, "bot": {"type": "from_match", "src": "r1_12"}, "preset_winner": null, "meta": null}, "r2_5": {"id": "r2_5", "label": "R2-5", "round": 2, "top": {"type": "known", "id": "little_red", "name": "Little Red Riding Hood", "tier": "A", "tc": "#22c55e"}, "bot": {"type": "from_match", "src": "r1_14"}, "preset_winner": null, "meta": null}, "r2_6": {"id": "r2_6", "label": "R2-6", "round": 2, "top": {"type": "known", "id": "dracula", "name": "Dracula", "tier": "B", "tc": "#3b82f6"}, "bot": {"type": "from_match", "src": "r1_1"}, "preset_winner": null, "meta": null}, "r2_7": {"id": "r2_7", "label": "R2-7", "round": 2, "top": {"type": "known", "id": "yennenga", "name": "Yennenga", "tier": "A+", "tc": "#f97316"}, "bot": {"type": "from_match", "src": "r1_13"}, "preset_winner": null, "meta": null}, "r2_8": {"id": "r2_8", "label": "R2-8", "round": 2, "top": {"type": "known", "id": "robert_muldoon", "name": "Robert Muldoon", "tier": "C", "tc": "#06b6d4"}, "bot": {"type": "known", "id": "raptors", "name": "Raptors", "tier": "C", "tc": "#06b6d4"}, "preset_winner": null, "meta": {"wp": 52.3, "wp_b": 47.7, "score": 0.648, "tier_diff": 0, "denied": false}}, "r2_9": {"id": "r2_9", "label": "R2-9", "round": 2, "top": {"type": "known", "id": "squirrel_girl", "name": "Squirrel Girl", "tier": "C", "tc": "#06b6d4"}, "bot": {"type": "known", "id": "sherlock_holmes", "name": "Sherlock Holmes", "tier": "S", "tc": "#f59e0b"}, "preset_winner": null, "meta": {"wp": 50.0, "wp_b": 50.0, "score": 0.8, "tier_diff": 4, "denied": false}}, "r2_10": {"id": "r2_10", "label": "R2-10", "round": 2, "top": {"type": "known", "id": "eredin", "name": "Eredin Breacc Glas", "tier": "C", "tc": "#06b6d4"}, "bot": {"type": "known", "id": "ms_marvel", "name": "Ms. Marvel", "tier": "C", "tc": "#06b6d4"}, "preset_winner": null, "meta": {"wp": 50.0, "wp_b": 50.0, "score": 0.8, "tier_diff": 0, "denied": false}}, "r2_11": {"id": "r2_11", "label": "R2-11", "round": 2, "top": {"type": "known", "id": "moon_knight", "name": "Moon Knight", "tier": "C", "tc": "#06b6d4"}, "bot": {"type": "from_match", "src": "r1_6"}, "preset_winner": null, "meta": null}, "r2_12": {"id": "r2_12", "label": "R2-12", "round": 2, "top": {"type": "from_match", "src": "r1_10"}, "bot": {"type": "known", "id": "luke_cage", "name": "Luke Cage", "tier": "C", "tc": "#06b6d4"}, "preset_winner": null, "meta": null}, "r2_13": {"id": "r2_13", "label": "R2-13", "round": 2, "top": {"type": "known", "id": "elektra", "name": "Elektra", "tier": "S", "tc": "#f59e0b"}, "bot": {"type": "from_match", "src": "r1_5"}, "preset_winner": null, "meta": null}, "r2_14": {"id": "r2_14", "label": "R2-14", "round": 2, "top": {"type": "known", "id": "yennefer_triss", "name": "Yennefer & Triss", "tier": "C", "tc": "#06b6d4"}, "bot": {"type": "known", "id": "ghost_rider", "name": "Ghost Rider", "tier": "C", "tc": "#06b6d4"}, "preset_winner": null, "meta": {"wp": 50.0, "wp_b": 50.0, "score": 0.8, "tier_diff": 0, "denied": false}}, "r2_15": {"id": "r2_15", "label": "R2-15", "round": 2, "top": {"type": "from_match", "src": "r1_11"}, "bot": {"type": "from_match", "src": "r1_9"}, "preset_winner": null, "meta": null}, "r2_16": {"id": "r2_16", "label": "R2-16", "round": 2, "top": {"type": "known", "id": "king_arthur", "name": "King Arthur", "tier": "D", "tc": "#94a3b8"}, "bot": {"type": "known", "id": "jekyll_hyde", "name": "Jekyll & Hyde", "tier": "C", "tc": "#06b6d4"}, "preset_winner": null, "meta": {"wp": 51.6, "wp_b": 48.4, "score": 0.826, "tier_diff": 1, "denied": false}}, "r3_1": {"id": "r3_1", "label": "R3-1", "round": 3, "top": {"type": "from_match", "src": "r2_1"}, "bot": {"type": "from_match", "src": "r2_2"}, "preset_winner": null, "meta": null}, "r3_2": {"id": "r3_2", "label": "R3-2", "round": 3, "top": {"type": "from_match", "src": "r2_3"}, "bot": {"type": "from_match", "src": "r2_4"}, "preset_winner": null, "meta": null}, "r3_3": {"id": "r3_3", "label": "R3-3", "round": 3, "top": {"type": "from_match", "src": "r2_5"}, "bot": {"type": "from_match", "src": "r2_6"}, "preset_winner": null, "meta": null}, "r3_4": {"id": "r3_4", "label": "R3-4", "round": 3, "top": {"type": "from_match", "src": "r2_7"}, "bot": {"type": "from_match", "src": "r2_8"}, "preset_winner": null, "meta": null}, "r3_5": {"id": "r3_5", "label": "R3-5", "round": 3, "top": {"type": "from_match", "src": "r2_9"}, "bot": {"type": "from_match", "src": "r2_10"}, "preset_winner": null, "meta": null}, "r3_6": {"id": "r3_6", "label": "R3-6", "round": 3, "top": {"type": "from_match", "src": "r2_11"}, "bot": {"type": "from_match", "src": "r2_12"}, "preset_winner": null, "meta": null}, "r3_7": {"id": "r3_7", "label": "R3-7", "round": 3, "top": {"type": "from_match", "src": "r2_13"}, "bot": {"type": "from_match", "src": "r2_14"}, "preset_winner": null, "meta": null}, "r3_8": {"id": "r3_8", "label": "R3-8", "round": 3, "top": {"type": "from_match", "src": "r2_15"}, "bot": {"type": "from_match", "src": "r2_16"}, "preset_winner": null, "meta": null}, "qf_1": {"id": "qf_1", "label": "QF-1", "round": 4, "top": {"type": "from_match", "src": "r3_1"}, "bot": {"type": "from_match", "src": "r3_2"}, "preset_winner": null, "meta": null}, "qf_2": {"id": "qf_2", "label": "QF-2", "round": 4, "top": {"type": "from_match", "src": "r3_3"}, "bot": {"type": "from_match", "src": "r3_4"}, "preset_winner": null, "meta": null}, "qf_3": {"id": "qf_3", "label": "QF-3", "round": 4, "top": {"type": "from_match", "src": "r3_5"}, "bot": {"type": "from_match", "src": "r3_6"}, "preset_winner": null, "meta": null}, "qf_4": {"id": "qf_4", "label": "QF-4", "round": 4, "top": {"type": "from_match", "src": "r3_7"}, "bot": {"type": "from_match", "src": "r3_8"}, "preset_winner": null, "meta": null}, "sf_1": {"id": "sf_1", "label": "SF-1", "round": 5, "top": {"type": "from_match", "src": "qf_1"}, "bot": {"type": "from_match", "src": "qf_2"}, "preset_winner": null, "meta": null}, "sf_2": {"id": "sf_2", "label": "SF-2", "round": 5, "top": {"type": "from_match", "src": "qf_3"}, "bot": {"type": "from_match", "src": "qf_4"}, "preset_winner": null, "meta": null}, "final": {"id": "final", "label": "FINAL", "round": 6, "top": {"type": "from_match", "src": "sf_1"}, "bot": {"type": "from_match", "src": "sf_2"}, "preset_winner": null, "meta": null}};
-const PNAME={P1:"Ahmad",P2:"Mohammad"}, PC={P1:"#3b82f6",P2:"#f97316"};
-let ST={};try{ST=JSON.parse(localStorage.getItem("um_v4")||"{}");}catch(e){}
-function save(){localStorage.setItem("um_v4",JSON.stringify(ST));}
 
-function getWinner(mid){const m=BK[mid];if(!m)return null;if(m.preset_winner)return m.preset_winner;return ST[mid]?.winner||null;}
-function resolve(slot){if(!slot)return null;if(slot.type==="known")return{id:slot.id,name:slot.name,tier:slot.tier,tc:slot.tc};const w=getWinner(slot.src);if(!w)return null;return dig(slot.src,w);}
-function dig(mid,fid){const m=BK[mid];if(!m)return{id:fid,name:fid,tier:"?",tc:"#6b7280"};const t=resolve(m.top);if(t&&t.id===fid)return t;const b=resolve(m.bot);if(b&&b.id===fid)return b;return{id:fid,name:fid,tier:"?",tc:"#6b7280"};}
-function pickWinner(mid,side){const m=BK[mid];if(!m||m.preset_winner)return;const f=side==="top"?resolve(m.top):resolve(m.bot);if(!f)return;ST[mid]={winner:f.id,side};save();renderAll();}
-function pickPlayer(mid,player){const m=BK[mid];if(!m)return;if(!ST[mid])ST[mid]={winner:m.preset_winner,side:"top"};ST[mid].player=player;save();renderAll();}
-function undoMatch(mid){const m=BK[mid];if(!m||m.preset_winner)return;delete ST[mid];cascade(mid);save();renderAll();}
-function cascade(mid){Object.keys(BK).forEach(k=>{const m=BK[k];if((m.top?.src===mid||m.bot?.src===mid)&&ST[k]){delete ST[k];cascade(k);}});}
-function resetAll(){if(!confirm("Reset all results?"))return;ST={};save();renderAll();}
-function tbHtml(f){if(!f)return"";const dark=["S","A+","A"].includes(f.tier);return`<span class="tb" style="background:${f.tc||"#6b7280"};color:${dark?"#000":"#fff"}">${f.tier||"?"}</span>`;}
-function updateSB(){let p1=0,p2=0;Object.values(ST).forEach(r=>{if(r.player==="P1")p1++;else if(r.player==="P2")p2++;});document.getElementById("p1score").textContent=p1;document.getElementById("p2score").textContent=p2;document.getElementById("p1panel").classList.toggle("lead",p1>p2);document.getElementById("p2panel").classList.toggle("lead",p2>p1);}
+const PNAME = {P1:"Ahmad", P2:"Mohammad"};
+const PC    = {P1:"#60a5fa", P2:"#fb923c"};
+const ROUNDS = {
+  r1:   {ids: ["r1_1","r1_2","r1_3","r1_4","r1_5","r1_6","r1_7","r1_8","r1_9","r1_10","r1_11","r1_12","r1_13","r1_14","r1_15"]},
+  r2:   {ids: ["r2_1","r2_2","r2_3","r2_4","r2_5","r2_6","r2_7","r2_8","r2_9","r2_10","r2_11","r2_12","r2_13","r2_14","r2_15","r2_16"]},
+  r3:   {ids: ["r3_1","r3_2","r3_3","r3_4","r3_5","r3_6","r3_7","r3_8"]},
+  qf:   {ids: ["qf_1","qf_2","qf_3","qf_4"]},
+  sf:   {ids: ["sf_1","sf_2"]},
+  final:{ids: ["final"]}
+};
 
-function renderCard(mid){
-  const el=document.getElementById("mc-"+mid);if(!el)return;
-  const m=BK[mid],tf=resolve(m.top),bf=resolve(m.bot);
-  const w=getWinner(mid),res=ST[mid],isPreset=!!m.preset_winner;
-  const bothKnown=!!(tf&&bf),hasWin=!!w,hasPl=!!(res?.player||(isPreset&&ST[mid]?.player));
-  const waiting=hasWin&&!hasPl,complete=hasWin&&hasPl;
-  const meta=m.meta;
-  el.className="mc"+(complete?" done":"")+(waiting?" picking":"")+(meta?.denied?" denied":"")+(!bothKnown&&!isPreset?" dim":"");
+let ST = {};
+try { ST = JSON.parse(localStorage.getItem("um_v5") || "{}"); } catch(e) {}
+function save() { localStorage.setItem("um_v5", JSON.stringify(ST)); }
 
-  let lrow=`<div class="lrow"><span class="ltext">${m.label}</span>`;
-  if(meta?.score!=null){const s=meta.score,c=s>=.75?"#22c55e":s>=.55?"#84cc16":s>=.35?"#eab308":"#f97316";lrow+=`<span class="sc-b" style="background:${c};color:#000">${s.toFixed(2)}</span>`;}
-  if(meta?.denied)lrow+=`<span class="sc-b" style="background:#ef4444;color:#fff">⚠</span>`;
-  if(complete)lrow+=`<span class="done-b">✓</span>`;
-  lrow+="</div>";
-
-  
-    // Full: show all possible fighters recursively
-    function allPossible(slot, d) {
-      d = d || 0; if (!slot || d > 6) return [];
-      if (slot.type==="known") { const f=resolve(slot); return f?[f]:[]; }
-      const w2 = getWinner(slot.src); if (w2) return [dig(slot.src, w2)];
-      const src = BK[slot.src]; if (!src) return [];
-      const seen=new Set(), out=[];
-      [...allPossible(src.top,d+1),...allPossible(src.bot,d+1)].forEach(f=>{
-        if(!seen.has(f.id)){seen.add(f.id);out.push(f);}
-      });
-      return out;
-    }
-    function fname(f, side) {
-      if (!f) {
-        const poss = allPossible(side==="top" ? m.top : m.bot);
-        if (!poss.length) return `<span class="mf-name tbd">⏳ TBD</span>`;
-        if (poss.length <= 2)
-          return `<span class="mf-name tbd">W: ${poss.map(p=>p.name+" "+tbHtml(p)).join(" <em>vs</em> ")}</span>`;
-        return `<span class="mf-name tbd possible">
-          <span class="poss-label">Possible (${poss.length}):</span>
-          ${poss.map(p=>`<span class="poss-chip">${p.name} ${tbHtml(p)}</span>`).join("")}
-        </span>`;
-      }
-      const isW=w&&f.id===w, isL=w&&f.id!==w;
-      return `<span class="mf-name ${isW?"won":isL?"lost":""}">${f.name} ${tbHtml(f)}${isW?" ♛":""}</span>`;
-    }
-    
-
-  let fbar="";
-  if(meta?.wp!=null&&!meta.denied){const d=Math.abs(meta.wp-50),c=d<=2?"#22c55e":d<=3.5?"#84cc16":d<=5?"#eab308":"#ef4444";fbar=`<div class="fbar-wrap"><div class="fbar-fill" style="width:${meta.wp}%;background:${c}"></div></div><div class="fbar-pct">${meta.wp}% vs ${meta.wp_b}%</div>`;}
-
-  let action="";
-  if(complete){
-    const pl=res?.player,pc=pl?PC[pl]:"#94a3b8";
-    if(isPreset&&!pl){action=`<p class="pick-label">Who played ${dig(mid,w).name}?</p><div class="player-btns"><button class="pb-p1" onclick="pickPlayer('${mid}','P1')">Ahmad</button><button class="pb-p2" onclick="pickPlayer('${mid}','P2')">Mohammad</button></div>`;}
-    else{action=`<div class="result-row"><span class="player-tag" style="color:${pc}">🎮 ${pl?PNAME[pl]+" ("+pl+")":"—"}</span>${!isPreset?`<button class="undo-btn" onclick="undoMatch('${mid}')">↩</button>`:""}</div>`;}
-  }else if(waiting){action=`<p class="pick-label">♛ ${dig(mid,w).name} — who played?</p><div class="player-btns"><button class="pb-p1" onclick="pickPlayer('${mid}','P1')">Ahmad</button><button class="pb-p2" onclick="pickPlayer('${mid}','P2')">Mohammad</button></div>`;}
-  else if(bothKnown&&!isPreset){action=`<div class="win-btns"><button class="win-btn" onclick="pickWinner('${mid}','top')">${tf.name} wins</button><button class="win-btn" onclick="pickWinner('${mid}','bot')">${bf.name} wins</button></div>`;}
-  else if(isPreset&&!hasWin){action=`<p class="pick-label">♛ ${dig(mid,m.preset_winner).name} won — who played?</p><div class="player-btns"><button class="pb-p1" onclick="pickPlayer('${mid}','P1')">Ahmad</button><button class="pb-p2" onclick="pickPlayer('${mid}','P2')">Mohammad</button></div>`;}
-
-  el.innerHTML=lrow+fname(tf,"top")+`<div class="vs-txt">${complete?"def.":"vs"}</div>`+fname(bf,"bot")+fbar+action;
+// ── Core logic ────────────────────────────────────────────────────────────────
+function getWinner(mid) {
+  const m = BK[mid]; if (!m) return null;
+  if (m.preset_winner) return m.preset_winner;
+  return ST[mid]?.winner || null;
 }
-function renderAll(){Object.keys(BK).forEach(renderCard);updateSB();}
+function resolve(slot) {
+  if (!slot) return null;
+  if (slot.type === "known") return {id:slot.id, name:slot.name, tier:slot.tier, tc:slot.tc};
+  const w = getWinner(slot.src); if (!w) return null;
+  return dig(slot.src, w);
+}
+function dig(mid, fid) {
+  const m = BK[mid]; if (!m) return {id:fid, name:fid, tier:"?", tc:"#6b7280"};
+  const t = resolve(m.top); if (t && t.id === fid) return t;
+  const b = resolve(m.bot); if (b && b.id === fid) return b;
+  return {id:fid, name:fid, tier:"?", tc:"#6b7280"};
+}
+function allPossible(slot, d) {
+  d = d || 0; if (!slot || d > 6) return [];
+  if (slot.type === "known") { const f = resolve(slot); return f ? [f] : []; }
+  const w2 = getWinner(slot.src); if (w2) return [dig(slot.src, w2)];
+  const src = BK[slot.src]; if (!src) return [];
+  const seen = new Set(), out = [];
+  [...allPossible(src.top, d+1), ...allPossible(src.bot, d+1)].forEach(f => {
+    if (!seen.has(f.id)) { seen.add(f.id); out.push(f); }
+  });
+  return out;
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+function pickWinner(mid, side) {
+  const m = BK[mid]; if (!m || m.preset_winner) return;
+  const f = side === "top" ? resolve(m.top) : resolve(m.bot);
+  if (!f) return;
+  ST[mid] = {winner: f.id, side};
+  save(); renderAll();
+}
+function pickPlayer(mid, player) {
+  const m = BK[mid]; if (!m) return;
+  if (!ST[mid]) ST[mid] = {winner: m.preset_winner, side:"top"};
+  ST[mid].player = player;
+  save(); renderAll();
+}
+function undoMatch(mid) {
+  const m = BK[mid]; if (!m || m.preset_winner) return;
+  delete ST[mid]; cascade(mid); save(); renderAll();
+}
+function cascade(mid) {
+  Object.keys(BK).forEach(k => {
+    const m = BK[k];
+    if ((m.top?.src === mid || m.bot?.src === mid) && ST[k]) { delete ST[k]; cascade(k); }
+  });
+}
+function resetAll() {
+  if (!confirm("Reset all recorded results?")) return;
+  ST = {}; save(); renderAll();
+}
+
+// ── Rendering ─────────────────────────────────────────────────────────────────
+function tbHtml(f) {
+  if (!f) return "";
+  const dark = ["S","A+","A"].includes(f.tier);
+  return `<span class="tb" style="background:${f.tc||"#6b7280"};color:${dark?"#000":"#fff"}">${f.tier||"?"}</span>`;
+}
+
+function renderCard(mid) {
+  const el = document.getElementById("mc-" + mid); if (!el) return;
+  const m  = BK[mid];
+  const tf = resolve(m.top);
+  const bf = resolve(m.bot);
+  const w  = getWinner(mid);
+  const res = ST[mid];
+  const isPreset = !!m.preset_winner;
+  const bothKnown = !!(tf && bf);
+  const hasWin = !!w;
+  const hasPl  = !!(res?.player || (isPreset && ST[mid]?.player));
+  const waiting  = hasWin && !hasPl;
+  const complete = hasWin && hasPl;
+  const meta = m.meta;
+
+  el.className = "mc" +
+    (complete ? " done" : "") +
+    (waiting  ? " picking" : "") +
+    (meta?.denied ? " denied" : "") +
+    (!bothKnown && !isPreset ? " dim" : "");
+
+  // ── Label row ──
+  let lrow = `<div class="lrow"><span class="ltext">${m.label}</span>`;
+  if (meta?.score != null) {
+    const s = meta.score, c = s>=.75?"#22c55e":s>=.55?"#84cc16":s>=.35?"#eab308":"#f97316";
+    lrow += `<span class="sc-b" style="background:${c};color:#000">${s.toFixed(2)}</span>`;
+  }
+  if (meta?.denied) lrow += `<span class="sc-b" style="background:#ef4444;color:#fff">⚠ Denied</span>`;
+  if (complete) lrow += `<span class="done-b">✓ Done</span>`;
+  lrow += "</div>";
+
+  // ── Fighter row helper ──
+  function fRow(f, side) {
+    if (!f) {
+      const poss = allPossible(side === "top" ? m.top : m.bot);
+      if (!poss.length) return `<div class="fighter ${side==="top"?"top-f":"bot-f"}"><span class="f-name tbd">⏳ TBD</span></div>`;
+      if (poss.length <= 2)
+        return `<div class="fighter ${side==="top"?"top-f":"bot-f"}"><span class="f-name tbd">W: ${poss.map(p=>p.name+" "+tbHtml(p)).join(" vs ")}</span></div>`;
+      return `<div class="fighter ${side==="top"?"top-f":"bot-f"}">
+        <span class="f-name tbd">Possible:<br><span class="poss-list">${poss.map(p=>`<span class="poss-chip">${p.name} ${tbHtml(p)}</span>`).join("")}</span></span>
+      </div>`;
+    }
+    const isW = w && f.id === w, isL = w && f.id !== w;
+    return `<div class="fighter ${side==="top"?"top-f":"bot-f"}${isW?" won-f":isL?" lost-f":""}">
+      ${tbHtml(f)}<span class="f-name${isW?" won":isL?" lost":""}">${f.name}</span>${isW?`<span class="crown">♛</span>`:""}
+    </div>`;
+  }
+
+  const fighters = `<div class="fighters-wrap">
+    ${fRow(tf,"top")}
+    <div class="vs-row">${complete?"def.":"vs"}</div>
+    ${fRow(bf,"bot")}
+  </div>`;
+
+  // ── Fairness bar ──
+  let fbar = "";
+  if (meta?.wp != null && !meta.denied) {
+    const d = Math.abs(meta.wp - 50), bc = d<=2?"#22c55e":d<=3.5?"#84cc16":d<=5?"#eab308":"#ef4444";
+    fbar = `<div class="fbar-wrap"><div class="fbar-fill" style="width:${meta.wp}%;background:${bc}"></div></div>
+            <div class="fbar-pct">${meta.wp}% vs ${meta.wp_b}%</div>`;
+  }
+
+  // ── Action area ──
+  let action = "";
+  if (complete) {
+    const pl = res?.player, pc = pl ? PC[pl] : "#94a3b8";
+    if (isPreset && !pl) {
+      action = `<p class="pick-label">Who played ${dig(mid,w).name}?</p>
+        <div class="player-btns">
+          <button class="pb-p1" onclick="pickPlayer('${mid}','P1')">Ahmad</button>
+          <button class="pb-p2" onclick="pickPlayer('${mid}','P2')">Mohammad</button>
+        </div>`;
+    } else {
+      action = `<div class="result-row">
+        <span class="player-tag" style="color:${pc}">🎮 ${pl ? PNAME[pl]+" ("+pl+")" : "—"}</span>
+        ${!isPreset ? `<button class="undo-btn" onclick="undoMatch('${mid}')">↩ undo</button>` : ""}
+      </div>`;
+    }
+  } else if (waiting) {
+    action = `<p class="pick-label">♛ ${dig(mid,w).name} wins — who played?</p>
+      <div class="player-btns">
+        <button class="pb-p1" onclick="pickPlayer('${mid}','P1')">Ahmad</button>
+        <button class="pb-p2" onclick="pickPlayer('${mid}','P2')">Mohammad</button>
+      </div>`;
+  } else if (bothKnown && !isPreset) {
+    action = `<div class="win-btns">
+      <button class="win-btn" onclick="pickWinner('${mid}','top')">${tf.name} wins</button>
+      <button class="win-btn" onclick="pickWinner('${mid}','bot')">${bf.name} wins</button>
+    </div>`;
+  } else if (isPreset && !hasWin) {
+    action = `<p class="pick-label">♛ ${dig(mid, m.preset_winner).name} won — who played?</p>
+      <div class="player-btns">
+        <button class="pb-p1" onclick="pickPlayer('${mid}','P1')">Ahmad</button>
+        <button class="pb-p2" onclick="pickPlayer('${mid}','P2')">Mohammad</button>
+      </div>`;
+  }
+
+  el.innerHTML = lrow + fighters + fbar + action;
+}
+
+function updateSB() {
+  let p1 = 0, p2 = 0;
+  Object.values(ST).forEach(r => { if (r.player==="P1") p1++; else if (r.player==="P2") p2++; });
+  document.getElementById("p1score").textContent = p1;
+  document.getElementById("p2score").textContent = p2;
+  document.getElementById("p1panel").classList.toggle("lead", p1 > p2);
+  document.getElementById("p2panel").classList.toggle("lead", p2 > p1);
+}
+
+function updateTabBadges() {
+  Object.entries(ROUNDS).forEach(([key, rnd]) => {
+    const badge = document.getElementById("badge-" + key);
+    if (!badge) return;
+    const total = rnd.ids.length;
+    const done = rnd.ids.filter(id => {
+      const res = ST[id];
+      const m = BK[id];
+      return !!(res?.player || (m?.preset_winner && ST[id]?.player));
+    }).length;
+    badge.textContent = done === total ? "✓" : `${done}/${total}`;
+    badge.className = "tab-badge " + (done === total ? "done" : done > 0 ? "partial" : "empty");
+  });
+}
+
+function renderAll() {
+  Object.keys(BK).forEach(renderCard);
+  updateSB();
+  updateTabBadges();
+}
+
+// ── Tab navigation ────────────────────────────────────────────────────────────
+function showTab(key) {
+  document.querySelectorAll(".round-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  const panel = document.getElementById("panel-" + key);
+  const tab   = document.getElementById("tab-" + key);
+  if (panel) panel.classList.add("active");
+  if (tab)   tab.classList.add("active");
+}
+
 renderAll();
-</script></body></html>
+</script>
+</body>
+</html>
