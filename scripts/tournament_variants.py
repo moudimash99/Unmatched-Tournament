@@ -460,6 +460,6 @@ HTML_B2 = f"""<!DOCTYPE html><html lang="en"><head>
 for fname_out, html in [("tournament_a.html", HTML_A),
                          ("tournament_b1.html", HTML_B1),
                          ("tournament_b2.html", HTML_B2)]:
-    with open(fname_out, "w", encoding="utf-8") as f:
+  with open(f"generated/{fname_out}", "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"Written: {fname_out}")
+  print(f"Written: generated/{fname_out}")

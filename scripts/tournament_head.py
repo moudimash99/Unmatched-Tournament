@@ -3,10 +3,10 @@ from itertools import combinations
 sys.stdout.reconfigure(encoding="utf-8")
 
 # ── Load ───────────────────────────────────────────────────────────────────
-with open("merged_win_pct.json") as f:
+with open("data/merged_win_pct.json") as f:
     matrix = json.load(f)
 
-with open("fighters.json") as f:
+with open("data/fighters.json") as f:
     NAME = {f["id"]: f["name"] for f in json.load(f)["fighters"]}
 NAME.update({"the_golden_bat":"The Golden Bat","philippa_eilhart":"Philippa Eilhart","eredin":"Eredin Breacc Glas"})
 def n(fid): return NAME.get(fid, fid.replace("_"," ").title())

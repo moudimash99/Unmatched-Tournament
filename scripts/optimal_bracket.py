@@ -17,7 +17,7 @@ TOURNAMENT_FIGHTERS = [
 ALREADY_IN_R2 = ['bullseye', 'robin_hood']
 REMAINING = [f for f in TOURNAMENT_FIGHTERS if f not in ALREADY_IN_R2]
 
-with open('win_matrix.json', 'r') as fp:
+with open('data/win_matrix.json', 'r') as fp:
     matrix = json.load(fp)
 
 ID_MAP = {

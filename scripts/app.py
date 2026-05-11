@@ -1,11 +1,15 @@
 import os, hashlib
+from pathlib import Path
 from flask import Flask, request, session, redirect, send_file
 
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
 
+ROOT_DIR = Path(__file__).resolve().parent.parent
 PW_HASH  = os.environ["PASSWORD_HASH"]
-HTML_FILE = os.environ.get("HTML_FILE", "tournament_a.html")
+HTML_FILE = Path(os.environ.get("HTML_FILE", "generated/tournament_a.html"))
+if not HTML_FILE.is_absolute():
+  HTML_FILE = ROOT_DIR / HTML_FILE
 
 def check(pw):
     return hashlib.sha256(pw.encode()).hexdigest() == PW_HASH
@@ -36,8 +40,8 @@ button:hover{opacity:.88}
 </style></head>
 <body>
 <div class="card">
-  <h1>&#9876; Unmatched Tournament</h1>
-  <p>Enter password to access</p>
+  <h1>&#9876; Unmatched Tournament </h1>
+  <p>Enter password to access the tournament</p>
   <form method="POST">
     <input type="password" name="password" placeholder="Password" autofocus>
     <button type="submit">Enter</button>
@@ -49,13 +53,13 @@ button:hover{opacity:.88}
 @app.route("/", methods=["GET", "POST"])
 def index():
     if session.get("auth"):
-        return send_file(HTML_FILE)
+        return send_file(str(HTML_FILE))
     if request.method == "POST":
         if check(request.form.get("password", "")):
             session["auth"] = True
             return redirect("/")
-        return LOGIN.format(error='<p class="err">Incorrect password</p>'), 401
-    return LOGIN.format(error="")
+        return LOGIN.replace("{error}", '<p class="err">Incorrect password</p>'), 401
+    return LOGIN.replace("{error}", "")
 
 @app.route("/logout")
 def logout():
