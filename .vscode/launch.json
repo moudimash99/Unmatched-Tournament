@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+    
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/app.py",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "env": {
+                "PORT": "8743",
+                "HTML_FILE": "generated/tournament_a.html",
+                "PASSWORD_HASH": "ffc95ec3d76299005bbf243be9b40a87e1eda059c1d801c92c52a2ecb2fe569a",
+                "SECRET_KEY": "12c641fcdc309a715075fffee3e9b819040cf4a9f74d3f4911bd290d74df265f"
+            }
+        }
+    ]
+}

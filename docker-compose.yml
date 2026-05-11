@@ -6,13 +6,13 @@ services:
       - "8742:8742"
     environment:
       PORT: "8742"
-      HTML_FILE: "tournament_a.html"
-      PASSWORD_HASH: "8b23fadf05a3846fb8d537ba97975e884634fc146ef709f54caa73a409e86420"
+      HTML_FILE: "generated/tournament_a.html"
+      PASSWORD_HASH: "ffc95ec3d76299005bbf243be9b40a87e1eda059c1d801c92c52a2ecb2fe569a"
       SECRET_KEY: "12c641fcdc309a715075fffee3e9b819040cf4a9f74d3f4911bd290d74df265f"
     restart: unless-stopped
-    networks:
-      - proxy_net
+#     networks:
+#       - proxy_net
 
-networks:
-  proxy_net:
-    external: true
+# networks:
+#   proxy_net:
+#     external: true

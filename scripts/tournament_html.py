@@ -444,6 +444,6 @@ renderAll();
 </body>
 </html>"""
 
-with open("tournament.html","w",encoding="utf-8") as f:
+with open("generated/tournament.html","w",encoding="utf-8") as f:
     f.write(HTML)
-print("\nHTML written to tournament.html")
+print("\nHTML written to generated/tournament.html")
