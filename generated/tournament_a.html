@@ -4,6 +4,8 @@
 <title>Tournament — Pro Bracket</title><style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#05070f;--panel:#111827;--panel-2:#0f172a;--line:#334155;--accent:#f97316;--text:#e2e8f0;--muted:#94a3b8;--round-count:6;--round-col-min:230px;--round-gap:2.4rem;--r2-gap:1.45rem;--r3-gap:3.45rem;--qf-gap:8.3rem;--sf-gap:20rem}
+@media (max-width:1600px){:root{--round-col-min:200px;--round-gap:1.5rem;--r2-gap:1.2rem;--r3-gap:2.95rem;--qf-gap:7.4rem;--sf-gap:18rem}}
+@media (max-width:1200px){:root{--round-col-min:175px;--round-gap:.95rem;--r2-gap:1rem;--r3-gap:2.25rem;--qf-gap:5.8rem;--sf-gap:15rem}.round-title{font-size:.66rem;letter-spacing:.14em}.mc{padding:.56rem .62rem}}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(circle at top,#172554 0%,#05070f 45%);color:var(--text);min-height:100vh}
 header{padding:1.2rem 1.2rem .9rem;border-bottom:1px solid #1e293b;background:linear-gradient(120deg,#111827,#0b1220 70%)}
 h1{font-size:1.55rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#f8fafc;text-align:center}
@@ -21,10 +23,10 @@ h1{font-size:1.55rem;font-weight:900;text-transform:uppercase;letter-spacing:.08
 .reset-btn:hover{color:#ef4444;border-color:#ef4444}
 
 main{padding:1.2rem}
-.board-shell{background:linear-gradient(160deg,#0b1220,#060a14);border:1px solid #1e293b;border-radius:18px;padding:1.1rem;overflow:auto;box-shadow:0 20px 40px rgba(0,0,0,.35)}
+.board-shell{background:linear-gradient(160deg,#0b1220,#060a14);border:1px solid #1e293b;border-radius:18px;padding:1.1rem;overflow:auto;scrollbar-gutter:stable both-edges;box-shadow:0 20px 40px rgba(0,0,0,.35)}
 .board-shell:focus-visible{outline:2px solid #f97316;outline-offset:2px}
 .scroll-hint{font-size:.65rem;color:#94a3b8;letter-spacing:.08em;text-transform:uppercase;margin:0 0 .75rem .15rem}
-.board{display:grid;grid-template-columns:repeat(var(--round-count),minmax(var(--round-col-min),1fr));gap:var(--round-gap);min-width:calc(var(--round-count) * var(--round-col-min) + (var(--round-count) - 1) * var(--round-gap));position:relative}
+.board{display:grid;grid-template-columns:repeat(var(--round-count),minmax(var(--round-col-min),1fr));gap:var(--round-gap);min-width:calc(var(--round-count) * var(--round-col-min) + (var(--round-count) - 1) * var(--round-gap));padding-right:.9rem;position:relative}
 .round-col{position:relative}
 .round-title{font-size:.72rem;color:#f97316;font-weight:800;text-transform:uppercase;letter-spacing:.18em;margin-bottom:.75rem;text-align:center}
 .round-stack{display:flex;flex-direction:column;position:relative}
