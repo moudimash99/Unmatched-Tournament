@@ -141,9 +141,10 @@ async function rebalanceCurrentRound(){
   const orig=slots.map(s=>s.fighter.id),uniq=[...new Set(orig)];
   const pairReq=[];for(let i=0;i<uniq.length;i++)for(let j=i+1;j<uniq.length;j++)pairReq.push(pairIsBalanced(uniq[i],uniq[j]));
   await Promise.all(pairReq);
-  const isValid=arr=>{for(let i=0;i<arr.length;i+=2){if(!RB_PAIR_OK[pairKey(arr[i],arr[i+1])])return false;}return true;};
+  const eachPair=(arr,fn)=>{for(let i=0;i<arr.length;i+=2){if(fn(arr[i],arr[i+1],i)===false)return false;}return true;};
+  const isValid=arr=>eachPair(arr,(a,b)=>RB_PAIR_OK[pairKey(a,b)]);
   if(isValid(orig)){alert("Current round is already balanced (all matchups are within 45–55%).");return;}
-  const firstBad=arr=>{for(let i=0;i<arr.length;i+=2)if(!RB_PAIR_OK[pairKey(arr[i],arr[i+1])])return i;return-1;};
+  const firstBad=arr=>{let out=-1;eachPair(arr,(a,b,i)=>{if(!RB_PAIR_OK[pairKey(a,b)]){out=i;return false;}});return out;};
   const MAX_REBALANCE_SEARCH_DEPTH=8;
   const maxDepth=Math.min(MAX_REBALANCE_SEARCH_DEPTH,orig.length/2);
   let solved=null;
@@ -153,7 +154,7 @@ async function rebalanceCurrentRound(){
       const bad=firstBad(arr);
       if(bad===-1)return arr.slice();
       if(d===0)return null;
-      const sk=`${d}|${arr.join(",")}`;if(seen.has(sk))return null;seen.add(sk);
+      const stateKey=`${d}|${arr.join(",")}`;if(seen.has(stateKey))return null;seen.add(stateKey);
       const swapCandidates=[bad,bad+1];
       for(const from of swapCandidates){
         for(let to=0;to<arr.length;to++){
@@ -166,7 +167,7 @@ async function rebalanceCurrentRound(){
     };
     solved=dfs(orig.slice(),depth);
   }
-  if(!solved){alert("Couldn't fully rebalance this round to 45–55% with a minimal number of swaps.");return;}
+  if(!solved){alert("Couldn't fully rebalance this round to 45–55% with a minimal number of swaps. Try adjusting matchups manually.");return;}
   const changed=solved.reduce((n,f,i)=>n+(f!==orig[i]?1:0),0);
   Object.keys(ST).forEach(k=>{if(BK[k]&&BK[k].round>=r)delete ST[k];});
   const lay={...(ST.__layout||{})};
