@@ -1,6 +1,6 @@
-import os, hashlib
+import os, hashlib, json
 from pathlib import Path
-from flask import Flask, request, session, redirect, send_file
+from flask import Flask, request, session, redirect, send_file, Response
 
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
@@ -10,6 +10,8 @@ PW_HASH  = os.environ["PASSWORD_HASH"]
 HTML_FILE = Path(os.environ.get("HTML_FILE", "generated/tournament_a.html"))
 if not HTML_FILE.is_absolute():
   HTML_FILE = ROOT_DIR / HTML_FILE
+
+STATE_FILE = ROOT_DIR / "data" / "state.json"
 
 def check(pw):
     return hashlib.sha256(pw.encode()).hexdigest() == PW_HASH
@@ -65,6 +67,25 @@ def index():
 def logout():
     session.clear()
     return redirect("/")
+
+@app.route("/api/state", methods=["GET"])
+def get_state():
+    if not session.get("auth"):
+        return "", 401
+    if STATE_FILE.exists():
+        return Response(STATE_FILE.read_text(encoding="utf-8"), content_type="application/json")
+    return Response("{}", content_type="application/json")
+
+@app.route("/api/state", methods=["POST"])
+def set_state():
+    if not session.get("auth"):
+        return "", 401
+    data = request.get_json(force=True, silent=True)
+    if data is None:
+        return "", 400
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    STATE_FILE.write_text(json.dumps(data), encoding="utf-8")
+    return "", 204
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8742))

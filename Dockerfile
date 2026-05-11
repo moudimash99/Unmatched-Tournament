@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY scripts ./scripts
 COPY generated ./generated
+COPY data ./data
 
 EXPOSE 8742
 
