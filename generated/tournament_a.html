@@ -142,9 +142,10 @@ async function rebalanceCurrentRound(){
   const pairReq=[];for(let i=0;i<uniq.length;i++)for(let j=i+1;j<uniq.length;j++)pairReq.push(pairIsBalanced(uniq[i],uniq[j]));
   await Promise.all(pairReq);
   const isValid=arr=>{for(let i=0;i<arr.length;i+=2){if(!RB_PAIR_OK[pairKey(arr[i],arr[i+1])])return false;}return true;};
-  if(isValid(orig)){alert("Current round is already balanced (all matchups are 45%+).");return;}
+  if(isValid(orig)){alert("Current round is already balanced (all matchups are within 45–55%).");return;}
   const firstBad=arr=>{for(let i=0;i<arr.length;i+=2)if(!RB_PAIR_OK[pairKey(arr[i],arr[i+1])])return i;return-1;};
-  const maxDepth=Math.min(8,orig.length/2);
+  const MAX_REBALANCE_SEARCH_DEPTH=8;
+  const maxDepth=Math.min(MAX_REBALANCE_SEARCH_DEPTH,orig.length/2);
   let solved=null;
   for(let depth=1;depth<=maxDepth&&!solved;depth++){
     const seen=new Set();
@@ -153,8 +154,8 @@ async function rebalanceCurrentRound(){
       if(bad===-1)return arr.slice();
       if(d===0)return null;
       const sk=`${d}|${arr.join(",")}`;if(seen.has(sk))return null;seen.add(sk);
-      const cand=[bad,bad+1];
-      for(const from of cand){
+      const swapCandidates=[bad,bad+1];
+      for(const from of swapCandidates){
         for(let to=0;to<arr.length;to++){
           if(to===from)continue;
           const nxt=arr.slice();[nxt[from],nxt[to]]=[nxt[to],nxt[from]];
@@ -165,7 +166,7 @@ async function rebalanceCurrentRound(){
     };
     solved=dfs(orig.slice(),depth);
   }
-  if(!solved){alert("Couldn't fully rebalance this round to 45%+ with a minimal number of swaps.");return;}
+  if(!solved){alert("Couldn't fully rebalance this round to 45–55% with a minimal number of swaps.");return;}
   const changed=solved.reduce((n,f,i)=>n+(f!==orig[i]?1:0),0);
   Object.keys(ST).forEach(k=>{if(BK[k]&&BK[k].round>=r)delete ST[k];});
   const lay={...(ST.__layout||{})};
