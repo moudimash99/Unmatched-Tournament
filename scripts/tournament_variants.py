@@ -131,6 +131,7 @@ h1{font-size:1.45rem;font-weight:800;color:#f59e0b;text-transform:uppercase;lett
 .bye-list{display:flex;flex-wrap:wrap;gap:.3rem}
 .bye-chip{background:#1e293b;border:1px solid #2d3748;border-radius:999px;padding:.16rem .55rem;font-size:.7rem;color:#cbd5e1;display:flex;align-items:center;gap:.2rem}
 footer{text-align:center;color:#334155;font-size:.59rem;padding:.7rem;border-top:1px solid #1e293b;margin-top:.7rem}
+.score-help{margin:.45rem auto 0;max-width:620px;font-size:.62rem;line-height:1.35;color:#94a3b8}
 """
 
 SB_HTML = """
@@ -140,6 +141,7 @@ SB_HTML = """
     <div class="panel" id="p2panel"><div class="ptag">P2</div><div class="pname">Mohammad</div><div class="pscore p2c" id="p2score">0</div></div>
   </div>
   <button class="reset-btn" onclick="resetAll()">↺ reset</button>
+  <p class="score-help">Scoring guide: score badge = matchup quality, and the bar always shows win % (top fighter vs bottom fighter). Green is near 50/50, yellow/red means less balanced.</p>
 """
 
 # ── Shared JS (two modes: full possible-fighters OR compact labels) ────────────
@@ -189,7 +191,21 @@ def make_js(compact_tbd=False):
 const BK = __BK__;
 const PNAME={P1:"Ahmad",P2:"Mohammad"}, PC={P1:"#3b82f6",P2:"#f97316"};
 let ST={};try{ST=JSON.parse(localStorage.getItem("um_v4")||"{}");}catch(e){}
+const WP_CACHE={},WP_PENDING=new Set();
 function save(){localStorage.setItem("um_v4",JSON.stringify(ST));}
+function loadPairWp(a,b){
+  const k=`${a}|${b}`,rk=`${b}|${a}`,m=WP_CACHE[k]||WP_CACHE[rk];
+  if(m||WP_PENDING.has(k))return m||null;
+  WP_PENDING.add(k);
+  fetch(`/api/win-pct?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`).then(r=>r.ok?r.json():null).then(d=>{
+    if(d&&d.wp!=null&&d.wp_b!=null){
+      const r1=Math.round(d.wp*10)/10,r2=Math.round(d.wp_b*10)/10;
+      const wm={wp:r1,wp_b:r2,denied:Math.abs(r1-50)>5};
+      WP_CACHE[k]=wm;WP_CACHE[rk]={wp:r2,wp_b:r1,denied:Math.abs(r2-50)>5};renderAll();
+    }
+  }).catch(()=>{}).finally(()=>WP_PENDING.delete(k));
+  return null;
+}
 
 function getWinner(mid){const m=BK[mid];if(!m)return null;if(m.preset_winner)return m.preset_winner;return ST[mid]?.winner||null;}
 function resolve(slot){if(!slot)return null;if(slot.type==="known")return{id:slot.id,name:slot.name,tier:slot.tier,tc:slot.tc};const w=getWinner(slot.src);if(!w)return null;return dig(slot.src,w);}
@@ -209,18 +225,20 @@ function renderCard(mid){
   const bothKnown=!!(tf&&bf),hasWin=!!w,hasPl=!!(res?.player||(isPreset&&ST[mid]?.player));
   const waiting=hasWin&&!hasPl,complete=hasWin&&hasPl;
   const meta=m.meta;
-  el.className="mc"+(complete?" done":"")+(waiting?" picking":"")+(meta?.denied?" denied":"")+(!bothKnown&&!isPreset?" dim":"");
+  const liveMeta=(bothKnown&&tf?.id&&bf?.id)?loadPairWp(tf.id,bf.id):null;
+  const shownMeta=liveMeta||meta;
+  el.className="mc"+(complete?" done":"")+(waiting?" picking":"")+(shownMeta?.denied?" denied":"")+(!bothKnown&&!isPreset?" dim":"");
 
   let lrow=`<div class="lrow"><span class="ltext">${m.label}</span>`;
   if(meta?.score!=null){const s=meta.score,c=s>=.75?"#22c55e":s>=.55?"#84cc16":s>=.35?"#eab308":"#f97316";lrow+=`<span class="sc-b" style="background:${c};color:#000">${s.toFixed(2)}</span>`;}
-  if(meta?.denied)lrow+=`<span class="sc-b" style="background:#ef4444;color:#fff">⚠</span>`;
+  if(shownMeta?.denied)lrow+=`<span class="sc-b" style="background:#ef4444;color:#fff">⚠</span>`;
   if(complete)lrow+=`<span class="done-b">✓</span>`;
   lrow+="</div>";
 
   __FNAME_LOGIC__
 
   let fbar="";
-  if(meta?.wp!=null&&!meta.denied){const d=Math.abs(meta.wp-50),c=d<=2?"#22c55e":d<=3.5?"#84cc16":d<=5?"#eab308":"#ef4444";fbar=`<div class="fbar-wrap"><div class="fbar-fill" style="width:${meta.wp}%;background:${c}"></div></div><div class="fbar-pct">${meta.wp}% vs ${meta.wp_b}%</div>`;}
+  if(shownMeta?.wp!=null){const d=Math.abs(shownMeta.wp-50),c=d<=2?"#22c55e":d<=3.5?"#84cc16":d<=5?"#eab308":"#ef4444";fbar=`<div class="fbar-wrap"><div class="fbar-fill" style="width:${shownMeta.wp}%;background:${c}"></div></div><div class="fbar-pct">${shownMeta.wp}% vs ${shownMeta.wp_b}%</div>`;}
 
   let action="";
   if(complete){

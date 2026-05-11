@@ -12,6 +12,11 @@ if not HTML_FILE.is_absolute():
   HTML_FILE = ROOT_DIR / HTML_FILE
 
 STATE_FILE = ROOT_DIR / "data" / "state.json"
+WIN_PCT_FILE = ROOT_DIR / "data" / "merged_win_pct.json"
+try:
+    WIN_PCT = json.loads(WIN_PCT_FILE.read_text(encoding="utf-8"))
+except Exception:
+    WIN_PCT = {}
 
 def check(pw):
     return hashlib.sha256(pw.encode()).hexdigest() == PW_HASH
@@ -86,6 +91,19 @@ def set_state():
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     STATE_FILE.write_text(json.dumps(data), encoding="utf-8")
     return "", 204
+
+@app.route("/api/win-pct", methods=["GET"])
+def get_win_pct():
+    if not session.get("auth"):
+        return "", 401
+    a = request.args.get("a", "")
+    b = request.args.get("b", "")
+    if not a or not b:
+        return "", 400
+    return {
+        "wp": WIN_PCT.get(a, {}).get(b),
+        "wp_b": WIN_PCT.get(b, {}).get(a),
+    }
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8742))
