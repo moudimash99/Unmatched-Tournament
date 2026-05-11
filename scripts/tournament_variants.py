@@ -131,6 +131,7 @@ h1{font-size:1.45rem;font-weight:800;color:#f59e0b;text-transform:uppercase;lett
 .bye-list{display:flex;flex-wrap:wrap;gap:.3rem}
 .bye-chip{background:#1e293b;border:1px solid #2d3748;border-radius:999px;padding:.16rem .55rem;font-size:.7rem;color:#cbd5e1;display:flex;align-items:center;gap:.2rem}
 footer{text-align:center;color:#334155;font-size:.59rem;padding:.7rem;border-top:1px solid #1e293b;margin-top:.7rem}
+.score-help{margin:.45rem auto 0;max-width:620px;font-size:.62rem;line-height:1.35;color:#94a3b8}
 """
 
 SB_HTML = """
@@ -140,6 +141,7 @@ SB_HTML = """
     <div class="panel" id="p2panel"><div class="ptag">P2</div><div class="pname">Mohammad</div><div class="pscore p2c" id="p2score">0</div></div>
   </div>
   <button class="reset-btn" onclick="resetAll()">↺ reset</button>
+  <p class="score-help">Scoring guide: score badge = matchup quality, and the bar always shows win % (top fighter vs bottom fighter). Green is near 50/50, yellow/red means less balanced.</p>
 """
 
 # ── Shared JS (two modes: full possible-fighters OR compact labels) ────────────

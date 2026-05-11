@@ -92,8 +92,9 @@ function loadPairWp(a,b){
   WP_PENDING.add(k);
   fetch(`/api/win-pct?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`).then(r=>r.ok?r.json():null).then(d=>{
     if(d&&d.wp!=null&&d.wp_b!=null){
-      const wm={wp:d.wp,wp_b:d.wp_b,denied:Math.abs(d.wp-50)>5};
-      WP_CACHE[k]=wm;WP_CACHE[rk]={wp:d.wp_b,wp_b:d.wp,denied:Math.abs(d.wp_b-50)>5};renderAll();
+      const r1=Math.round(d.wp*10)/10,r2=Math.round(d.wp_b*10)/10;
+      const wm={wp:r1,wp_b:r2,denied:Math.abs(r1-50)>5};
+      WP_CACHE[k]=wm;WP_CACHE[rk]={wp:r2,wp_b:r1,denied:Math.abs(r2-50)>5};renderAll();
     }
   }).catch(()=>{}).finally(()=>WP_PENDING.delete(k));
   return null;
