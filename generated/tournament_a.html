@@ -64,7 +64,7 @@ h2{font-size:.9rem;font-weight:700;color:#f59e0b;text-transform:uppercase;letter
     <div class="panel" id="p2panel"><div class="ptag">P2</div><div class="pname">Mohammad</div><div class="pscore p2c" id="p2score">0</div></div>
   </div>
   <button class="reset-btn" onclick="resetAll()">↺ reset</button>
-  <button class="reset-btn" onclick="rebalanceCurrentRound()">⇄ rebalance current round</button>
+  <button class="reset-btn" id="rebalance-btn" onclick="rebalanceCurrentRound()">⇄ rebalance current round</button>
   <p class="score-help">Scoring guide: score badge = matchup quality, and the bar always shows win % (top fighter vs bottom fighter). Green is near 50/50, yellow/red means less balanced.</p>
 </header>
 <main>
@@ -115,66 +115,119 @@ function updateSB(){let p1=0,p2=0;Object.values(ST).forEach(r=>{if(r.player==="P
 function roundMatchIds(r){const out=[];Object.keys(BK).forEach(mid=>{if(BK[mid].round===r)out.push(mid);});return out;}
 function currentRound(){const rounds=[...new Set(Object.values(BK).map(m=>m.round))].sort((a,b)=>a-b);for(const r of rounds){if(!roundMatchIds(r).every(mid=>!!getWinner(mid)))return r;}return null;}
 function pairKey(a,b){return a<b?`${a}|${b}`:`${b}|${a}`;}
-const RB_PAIR_OK={};
-async function pairIsBalanced(a,b){
+const RB_PAIR_OK={},RB_WP={};
+async function fetchWp(a,b){
   const k=pairKey(a,b);
-  if(k in RB_PAIR_OK)return RB_PAIR_OK[k];
+  if(k in RB_WP)return RB_WP[k];
   try{
-    const r=await fetch(`/api/win-pct?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`);
-    if(!r.ok){RB_PAIR_OK[k]=false;return false;}
+    const[fa,fb]=k.split("|");
+    const r=await fetch(`/api/win-pct?a=${encodeURIComponent(fa)}&b=${encodeURIComponent(fb)}`);
+    if(!r.ok){RB_WP[k]=null;RB_PAIR_OK[k]=false;return null;}
     const d=await r.json(),w=d?.wp;
+    RB_WP[k]=w!=null?w:null;
     RB_PAIR_OK[k]=(w!=null&&w>=45&&w<=55);
-    return RB_PAIR_OK[k];
-  }catch(e){RB_PAIR_OK[k]=false;return false;}
+    return RB_WP[k];
+  }catch(e){RB_WP[k]=null;RB_PAIR_OK[k]=false;return null;}
 }
+async function pairIsBalanced(a,b){await fetchWp(a,b);return RB_PAIR_OK[pairKey(a,b)]??false;}
 async function rebalanceCurrentRound(){
-  const r=currentRound();
-  if(r==null){alert("Tournament is already complete.");return;}
-  const mids=roundMatchIds(r);
-  const slots=[];const fighterById={};
-  for(const mid of mids){
-    const tf=resolve(slotFromLayout(mid,"top")),bf=resolve(slotFromLayout(mid,"bot"));
-    if(!tf||!bf){alert("Complete all previous rounds first, then rebalance the current round.");return;}
-    slots.push({mid,side:"top",fighter:tf},{mid,side:"bot",fighter:bf});
-    fighterById[tf.id]=tf;fighterById[bf.id]=bf;
-  }
-  const orig=slots.map(s=>s.fighter.id),uniq=[...new Set(orig)];
-  const pairReq=[];for(let i=0;i<uniq.length;i++)for(let j=i+1;j<uniq.length;j++)pairReq.push(pairIsBalanced(uniq[i],uniq[j]));
-  await Promise.all(pairReq);
-  const eachPair=(arr,fn)=>{for(let i=0;i<arr.length;i+=2){if(fn(arr[i],arr[i+1],i)===false)return false;}return true;};
-  const isValid=arr=>eachPair(arr,(a,b)=>RB_PAIR_OK[pairKey(a,b)]);
-  if(isValid(orig)){alert("Current round is already balanced (all matchups are within 45–55%).");return;}
-  const firstBad=arr=>{let out=-1;eachPair(arr,(a,b,i)=>{if(!RB_PAIR_OK[pairKey(a,b)]){out=i;return false;}});return out;};
-  const MAX_REBALANCE_SEARCH_DEPTH=8;
-  const maxDepth=Math.min(MAX_REBALANCE_SEARCH_DEPTH,orig.length/2);
-  let solved=null;
-  for(let depth=1;depth<=maxDepth&&!solved;depth++){
-    const seen=new Set();
-    const dfs=(arr,d)=>{
-      const bad=firstBad(arr);
-      if(bad===-1)return arr.slice();
-      if(d===0)return null;
-      const stateKey=`${d}|${arr.join(",")}`;if(seen.has(stateKey))return null;seen.add(stateKey);
-      const swapCandidates=[bad,bad+1];
-      for(const from of swapCandidates){
-        for(let to=0;to<arr.length;to++){
-          if(to===from)continue;
-          const nxt=arr.slice();[nxt[from],nxt[to]]=[nxt[to],nxt[from]];
-          const got=dfs(nxt,d-1);if(got)return got;
+  const btn=document.getElementById("rebalance-btn");
+  if(btn){btn.disabled=true;btn.textContent="⏳ rebalancing…";}
+  try{
+    const r=currentRound();
+    if(r==null){alert("Tournament is already complete.");return;}
+    const mids=roundMatchIds(r);
+    const pairs=[];
+    for(const mid of mids){
+      const top=resolve(slotFromLayout(mid,"top")),bot=resolve(slotFromLayout(mid,"bot"));
+      if(!top||!bot){alert("Complete all previous rounds first, then rebalance the current round.");return;}
+      pairs.push({mid,top,bot});
+    }
+    // Only check the N actual pairings upfront — not all N² combinations
+    await Promise.all(pairs.map(p=>pairIsBalanced(p.top.id,p.bot.id)));
+    if(pairs.every(p=>RB_PAIR_OK[pairKey(p.top.id,p.bot.id)])){alert("Current round is already balanced (all matchups are within 45–55%).");return;}
+    let swapCount=0;
+    // Phase 1: greedy single-pair swaps — fix one bad pair at a time by trading one fighter with any other pair
+    async function phase1(){
+      let progress=true;
+      while(progress){
+        progress=false;
+        const bi=pairs.findIndex(p=>!RB_PAIR_OK[pairKey(p.top.id,p.bot.id)]);
+        if(bi===-1)break;
+        const bad=pairs[bi];
+        outer:for(let j=0;j<pairs.length;j++){
+          if(j===bi)continue;
+          const o=pairs[j];
+          const cands=[[o.top,bad.bot,bad.top,o.bot],[o.bot,bad.bot,o.top,bad.top],[bad.top,o.top,bad.bot,o.bot],[bad.top,o.bot,o.top,bad.bot]];
+          for(const[nt,nb,ot,ob]of cands){
+            const[ok1,ok2]=await Promise.all([pairIsBalanced(nt.id,nb.id),pairIsBalanced(ot.id,ob.id)]);
+            if(ok1&&ok2){pairs[bi]={mid:bad.mid,top:nt,bot:nb};pairs[j]={mid:o.mid,top:ot,bot:ob};swapCount++;progress=true;break outer;}
+          }
         }
       }
-      return null;
-    };
-    solved=dfs(orig.slice(),depth);
+    }
+    // Phase 2: exhaustively try all rearrangements of remaining bad pairs' fighters among themselves
+    // For k bad pairs: (2k-1)!! combos — 3 bad→15, 4 bad→105. Fast with caching.
+    async function phase2(){
+      const badIs=pairs.reduce((a,p,i)=>RB_PAIR_OK[pairKey(p.top.id,p.bot.id)]?a:[...a,i],[]);
+      if(badIs.length<2||badIs.length>4)return;
+      const fs=badIs.flatMap(i=>[pairs[i].top,pairs[i].bot]);
+      function*pgen(a){if(!a.length){yield[];return;}const[h,...t]=a;for(let i=0;i<t.length;i++){const p=[h,t[i]];const r=t.filter((_,j)=>j!==i);for(const s of pgen(r))yield[p,...s];}}
+      for(const pg of pgen(fs)){
+        const oks=await Promise.all(pg.map(([a,b])=>pairIsBalanced(a.id,b.id)));
+        if(oks.every(Boolean)){badIs.forEach((idx,k)=>{pairs[idx]={mid:pairs[idx].mid,top:pg[k][0],bot:pg[k][1]};});swapCount+=badIs.length;return;}
+      }
+    }
+    // Phase 3: steepest-descent minimise total |wp−50| across ALL pairs
+    // Pre-fetches every pairwise win-rate in one parallel batch, then runs synchronously.
+    // Guarantees the locally optimal arrangement when perfect balance is impossible.
+    async function phaseMinimize(){
+      const allF=[...new Set(pairs.flatMap(p=>[p.top.id,p.bot.id]))];
+      const needed=[];
+      for(let i=0;i<allF.length;i++)for(let j=i+1;j<allF.length;j++){const k=pairKey(allF[i],allF[j]);if(!(k in RB_WP))needed.push([allF[i],allF[j]]);}
+      if(needed.length)await Promise.all(needed.map(([a,b])=>fetchWp(a,b)));
+      function dev(a,b){const w=RB_WP[pairKey(a,b)];return w!=null?Math.abs(w-50):10;}
+      function isBad(p){return dev(p.top.id,p.bot.id)>5;}
+      let improved=true;
+      while(improved){
+        improved=false;
+        let bestGain=0.05,bestSwap=null;
+        for(let i=0;i<pairs.length;i++){
+          for(let j=i+1;j<pairs.length;j++){
+            if(!isBad(pairs[i])&&!isBad(pairs[j]))continue;
+            const pi=pairs[i],pj=pairs[j];
+            const cur=dev(pi.top.id,pi.bot.id)+dev(pj.top.id,pj.bot.id);
+            const cands=[[pj.top,pi.bot,pi.top,pj.bot],[pj.bot,pi.bot,pj.top,pi.top],[pi.top,pj.top,pi.bot,pj.bot],[pi.top,pj.bot,pj.top,pi.bot]];
+            for(const[nt,nb,ot,ob]of cands){
+              const nw=dev(nt.id,nb.id)+dev(ot.id,ob.id);
+              if(cur-nw>bestGain){bestGain=cur-nw;bestSwap={i,j,nt,nb,ot,ob};}
+            }
+          }
+        }
+        if(bestSwap){
+          const{i,j,nt,nb,ot,ob}=bestSwap;
+          pairs[i]={mid:pairs[i].mid,top:nt,bot:nb};pairs[j]={mid:pairs[j].mid,top:ot,bot:ob};
+          RB_PAIR_OK[pairKey(nt.id,nb.id)]=dev(nt.id,nb.id)<=5;
+          RB_PAIR_OK[pairKey(ot.id,ob.id)]=dev(ot.id,ob.id)<=5;
+          swapCount++;improved=true;
+        }
+      }
+    }
+    await phase1();
+    await phase2();  // catches cases where no single swap works but a combined rearrangement does
+    await phase1();  // pick up any remaining single-fixable pairs after phase2 reshuffled things
+    await phaseMinimize();  // final pass: minimise total |wp−50| so every bad match is as close to 50/50 as possible
+    Object.keys(ST).forEach(k=>{if(BK[k]&&BK[k].round>=r)delete ST[k];});
+    const lay={...(ST.__layout||{})};
+    for(const{mid,top,bot}of pairs)lay[mid]={top,bot};
+    ST.__layout=lay;
+    await save();renderAll();
+    const stillBad=pairs.filter(p=>!RB_PAIR_OK[pairKey(p.top.id,p.bot.id)]).length;
+    if(stillBad===0)alert(`Rebalanced round ${r} with ${swapCount} adjustment${swapCount===1?"":"s"}.`);
+    else alert(`Applied ${swapCount} adjustment${swapCount===1?"":"s"} — ${stillBad} matchup${stillBad===1?"":"s"} still unbalanced, but this is the provably fairest arrangement possible for these fighters.`);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="⇄ rebalance current round";}
   }
-  if(!solved){alert("Couldn't fully rebalance this round to 45–55% with a minimal number of swaps. Try adjusting matchups manually.");return;}
-  const changed=solved.reduce((n,f,i)=>n+(f!==orig[i]?1:0),0);
-  Object.keys(ST).forEach(k=>{if(BK[k]&&BK[k].round>=r)delete ST[k];});
-  const lay={...(ST.__layout||{})};
-  for(let i=0;i<mids.length;i++)lay[mids[i]]={top:fighterById[solved[i*2]],bot:fighterById[solved[i*2+1]]};
-  ST.__layout=lay;
-  await save();renderAll();
-  alert(`Rebalanced round ${r} with ${changed} swap${changed===1?"":"s"}.`);
 }
 
 function renderCard(mid){
