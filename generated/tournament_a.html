@@ -64,6 +64,7 @@ h2{font-size:.9rem;font-weight:700;color:#f59e0b;text-transform:uppercase;letter
     <div class="panel" id="p2panel"><div class="ptag">P2</div><div class="pname">Mohammad</div><div class="pscore p2c" id="p2score">0</div></div>
   </div>
   <button class="reset-btn" onclick="resetAll()">↺ reset</button>
+  <button class="reset-btn" id="rebalance-btn" onclick="rebalanceCurrentRound()">⇄ rebalance current round</button>
   <p class="score-help">Scoring guide: score badge = matchup quality, and the bar always shows win % (top fighter vs bottom fighter). Green is near 50/50, yellow/red means less balanced.</p>
 </header>
 <main>
@@ -101,19 +102,137 @@ function loadPairWp(a,b){
 }
 
 function getWinner(mid){const m=BK[mid];if(!m)return null;if(m.preset_winner)return m.preset_winner;return ST[mid]?.winner||null;}
+function slotFromLayout(mid,side){const ov=ST.__layout?.[mid]?.[side];if(ov&&ov.id)return{type:"known",id:ov.id,name:ov.name,tier:ov.tier,tc:ov.tc};return BK[mid]?.[side]||null;}
 function resolve(slot){if(!slot)return null;if(slot.type==="known")return{id:slot.id,name:slot.name,tier:slot.tier,tc:slot.tc};const w=getWinner(slot.src);if(!w)return null;return dig(slot.src,w);}
-function dig(mid,fid){const m=BK[mid];if(!m)return{id:fid,name:fid,tier:"?",tc:"#6b7280"};const t=resolve(m.top);if(t&&t.id===fid)return t;const b=resolve(m.bot);if(b&&b.id===fid)return b;return{id:fid,name:fid,tier:"?",tc:"#6b7280"};}
-function pickWinner(mid,side){const m=BK[mid];if(!m||m.preset_winner)return;const f=side==="top"?resolve(m.top):resolve(m.bot);if(!f)return;ST[mid]={winner:f.id,side};save();renderAll();}
+function dig(mid,fid){const m=BK[mid];if(!m)return{id:fid,name:fid,tier:"?",tc:"#6b7280"};const t=resolve(slotFromLayout(mid,"top"));if(t&&t.id===fid)return t;const b=resolve(slotFromLayout(mid,"bot"));if(b&&b.id===fid)return b;return{id:fid,name:fid,tier:"?",tc:"#6b7280"};}
+function pickWinner(mid,side){const m=BK[mid];if(!m||m.preset_winner)return;const f=side==="top"?resolve(slotFromLayout(mid,"top")):resolve(slotFromLayout(mid,"bot"));if(!f)return;ST[mid]={winner:f.id,side};save();renderAll();}
 function pickPlayer(mid,player){const m=BK[mid];if(!m)return;if(!ST[mid])ST[mid]={winner:m.preset_winner,side:"top"};ST[mid].player=player;save();renderAll();}
 function undoMatch(mid){const m=BK[mid];if(!m||m.preset_winner)return;delete ST[mid];cascade(mid);save();renderAll();}
 function cascade(mid){Object.keys(BK).forEach(k=>{const m=BK[k];if((m.top?.src===mid||m.bot?.src===mid)&&ST[k]){delete ST[k];cascade(k);}});}
 function resetAll(){if(!confirm("Reset all results?"))return;ST={};save();renderAll();}
 function tbHtml(f){if(!f)return"";const dark=["S","A+","A"].includes(f.tier);return`<span class="tb" style="background:${f.tc||"#6b7280"};color:${dark?"#000":"#fff"}">${f.tier||"?"}</span>`;}
 function updateSB(){let p1=0,p2=0;Object.values(ST).forEach(r=>{if(r.player==="P1")p1++;else if(r.player==="P2")p2++;});document.getElementById("p1score").textContent=p1;document.getElementById("p2score").textContent=p2;document.getElementById("p1panel").classList.toggle("lead",p1>p2);document.getElementById("p2panel").classList.toggle("lead",p2>p1);}
+function roundMatchIds(r){const out=[];Object.keys(BK).forEach(mid=>{if(BK[mid].round===r)out.push(mid);});return out;}
+function currentRound(){const rounds=[...new Set(Object.values(BK).map(m=>m.round))].sort((a,b)=>a-b);for(const r of rounds){if(!roundMatchIds(r).every(mid=>!!getWinner(mid)))return r;}return null;}
+function pairKey(a,b){return a<b?`${a}|${b}`:`${b}|${a}`;}
+const RB_PAIR_OK={},RB_WP={};
+async function fetchWp(a,b){
+  const k=pairKey(a,b);
+  if(k in RB_WP)return RB_WP[k];
+  try{
+    const[fa,fb]=k.split("|");
+    const r=await fetch(`/api/win-pct?a=${encodeURIComponent(fa)}&b=${encodeURIComponent(fb)}`);
+    if(!r.ok){RB_WP[k]=null;RB_PAIR_OK[k]=false;return null;}
+    const d=await r.json(),w=d?.wp;
+    RB_WP[k]=w!=null?w:null;
+    RB_PAIR_OK[k]=(w!=null&&w>=45&&w<=55);
+    return RB_WP[k];
+  }catch(e){RB_WP[k]=null;RB_PAIR_OK[k]=false;return null;}
+}
+async function pairIsBalanced(a,b){await fetchWp(a,b);return RB_PAIR_OK[pairKey(a,b)]??false;}
+async function rebalanceCurrentRound(){
+  const btn=document.getElementById("rebalance-btn");
+  if(btn){btn.disabled=true;btn.textContent="⏳ rebalancing…";}
+  try{
+    const r=currentRound();
+    if(r==null){alert("Tournament is already complete.");return;}
+    const mids=roundMatchIds(r);
+    const pairs=[];
+    for(const mid of mids){
+      const top=resolve(slotFromLayout(mid,"top")),bot=resolve(slotFromLayout(mid,"bot"));
+      if(!top||!bot){alert("Complete all previous rounds first, then rebalance the current round.");return;}
+      pairs.push({mid,top,bot});
+    }
+    // Only check the N actual pairings upfront — not all N² combinations
+    await Promise.all(pairs.map(p=>pairIsBalanced(p.top.id,p.bot.id)));
+    if(pairs.every(p=>RB_PAIR_OK[pairKey(p.top.id,p.bot.id)])){alert("Current round is already balanced (all matchups are within 45–55%).");return;}
+    let swapCount=0;
+    // Phase 1: greedy single-pair swaps — fix one bad pair at a time by trading one fighter with any other pair
+    async function phase1(){
+      let progress=true;
+      while(progress){
+        progress=false;
+        const bi=pairs.findIndex(p=>!RB_PAIR_OK[pairKey(p.top.id,p.bot.id)]);
+        if(bi===-1)break;
+        const bad=pairs[bi];
+        outer:for(let j=0;j<pairs.length;j++){
+          if(j===bi)continue;
+          const o=pairs[j];
+          const cands=[[o.top,bad.bot,bad.top,o.bot],[o.bot,bad.bot,o.top,bad.top],[bad.top,o.top,bad.bot,o.bot],[bad.top,o.bot,o.top,bad.bot]];
+          for(const[nt,nb,ot,ob]of cands){
+            const[ok1,ok2]=await Promise.all([pairIsBalanced(nt.id,nb.id),pairIsBalanced(ot.id,ob.id)]);
+            if(ok1&&ok2){pairs[bi]={mid:bad.mid,top:nt,bot:nb};pairs[j]={mid:o.mid,top:ot,bot:ob};swapCount++;progress=true;break outer;}
+          }
+        }
+      }
+    }
+    // Phase 2: exhaustively try all rearrangements of remaining bad pairs' fighters among themselves
+    // For k bad pairs: (2k-1)!! combos — 3 bad→15, 4 bad→105. Fast with caching.
+    async function phase2(){
+      const badIs=pairs.reduce((a,p,i)=>RB_PAIR_OK[pairKey(p.top.id,p.bot.id)]?a:[...a,i],[]);
+      if(badIs.length<2||badIs.length>4)return;
+      const fs=badIs.flatMap(i=>[pairs[i].top,pairs[i].bot]);
+      function*pgen(a){if(!a.length){yield[];return;}const[h,...t]=a;for(let i=0;i<t.length;i++){const p=[h,t[i]];const r=t.filter((_,j)=>j!==i);for(const s of pgen(r))yield[p,...s];}}
+      for(const pg of pgen(fs)){
+        const oks=await Promise.all(pg.map(([a,b])=>pairIsBalanced(a.id,b.id)));
+        if(oks.every(Boolean)){badIs.forEach((idx,k)=>{pairs[idx]={mid:pairs[idx].mid,top:pg[k][0],bot:pg[k][1]};});swapCount+=badIs.length;return;}
+      }
+    }
+    // Phase 3: steepest-descent minimise total |wp−50| across ALL pairs
+    // Pre-fetches every pairwise win-rate in one parallel batch, then runs synchronously.
+    // Guarantees the locally optimal arrangement when perfect balance is impossible.
+    async function phaseMinimize(){
+      const allF=[...new Set(pairs.flatMap(p=>[p.top.id,p.bot.id]))];
+      const needed=[];
+      for(let i=0;i<allF.length;i++)for(let j=i+1;j<allF.length;j++){const k=pairKey(allF[i],allF[j]);if(!(k in RB_WP))needed.push([allF[i],allF[j]]);}
+      if(needed.length)await Promise.all(needed.map(([a,b])=>fetchWp(a,b)));
+      function dev(a,b){const w=RB_WP[pairKey(a,b)];return w!=null?Math.abs(w-50):10;}
+      function isBad(p){return dev(p.top.id,p.bot.id)>5;}
+      let improved=true;
+      while(improved){
+        improved=false;
+        let bestGain=0.05,bestSwap=null;
+        for(let i=0;i<pairs.length;i++){
+          for(let j=i+1;j<pairs.length;j++){
+            if(!isBad(pairs[i])&&!isBad(pairs[j]))continue;
+            const pi=pairs[i],pj=pairs[j];
+            const cur=dev(pi.top.id,pi.bot.id)+dev(pj.top.id,pj.bot.id);
+            const cands=[[pj.top,pi.bot,pi.top,pj.bot],[pj.bot,pi.bot,pj.top,pi.top],[pi.top,pj.top,pi.bot,pj.bot],[pi.top,pj.bot,pj.top,pi.bot]];
+            for(const[nt,nb,ot,ob]of cands){
+              const nw=dev(nt.id,nb.id)+dev(ot.id,ob.id);
+              if(cur-nw>bestGain){bestGain=cur-nw;bestSwap={i,j,nt,nb,ot,ob};}
+            }
+          }
+        }
+        if(bestSwap){
+          const{i,j,nt,nb,ot,ob}=bestSwap;
+          pairs[i]={mid:pairs[i].mid,top:nt,bot:nb};pairs[j]={mid:pairs[j].mid,top:ot,bot:ob};
+          RB_PAIR_OK[pairKey(nt.id,nb.id)]=dev(nt.id,nb.id)<=5;
+          RB_PAIR_OK[pairKey(ot.id,ob.id)]=dev(ot.id,ob.id)<=5;
+          swapCount++;improved=true;
+        }
+      }
+    }
+    await phase1();
+    await phase2();  // catches cases where no single swap works but a combined rearrangement does
+    await phase1();  // pick up any remaining single-fixable pairs after phase2 reshuffled things
+    await phaseMinimize();  // final pass: minimise total |wp−50| so every bad match is as close to 50/50 as possible
+    Object.keys(ST).forEach(k=>{if(BK[k]&&BK[k].round>=r)delete ST[k];});
+    const lay={...(ST.__layout||{})};
+    for(const{mid,top,bot}of pairs)lay[mid]={top,bot};
+    ST.__layout=lay;
+    await save();renderAll();
+    const stillBad=pairs.filter(p=>!RB_PAIR_OK[pairKey(p.top.id,p.bot.id)]).length;
+    if(stillBad===0)alert(`Rebalanced round ${r} with ${swapCount} adjustment${swapCount===1?"":"s"}.`);
+    else alert(`Applied ${swapCount} adjustment${swapCount===1?"":"s"} — ${stillBad} matchup${stillBad===1?"":"s"} still unbalanced, but this is the provably fairest arrangement possible for these fighters.`);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="⇄ rebalance current round";}
+  }
+}
 
 function renderCard(mid){
   const el=document.getElementById("mc-"+mid);if(!el)return;
-  const m=BK[mid],tf=resolve(m.top),bf=resolve(m.bot);
+  const m=BK[mid],tf=resolve(slotFromLayout(mid,"top")),bf=resolve(slotFromLayout(mid,"bot"));
   const w=getWinner(mid),res=ST[mid],isPreset=!!m.preset_winner;
   const bothKnown=!!(tf&&bf),hasWin=!!w,hasPl=!!(res?.player||(isPreset&&ST[mid]?.player));
   const waiting=hasWin&&!hasPl,complete=hasWin&&hasPl;
@@ -136,7 +255,7 @@ function renderCard(mid){
       const w2 = getWinner(slot.src); if (w2) return [dig(slot.src, w2)];
       const src = BK[slot.src]; if (!src) return [];
       const seen=new Set(), out=[];
-      [...allPossible(src.top,d+1),...allPossible(src.bot,d+1)].forEach(f=>{
+      [...allPossible(slotFromLayout(slot.src,"top"),d+1),...allPossible(slotFromLayout(slot.src,"bot"),d+1)].forEach(f=>{
         if(!seen.has(f.id)){seen.add(f.id);out.push(f);}
       });
       return out;
