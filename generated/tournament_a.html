@@ -65,6 +65,8 @@ h2{font-size:.9rem;font-weight:700;color:#f59e0b;text-transform:uppercase;letter
   </div>
   <button class="reset-btn" onclick="resetAll()">↺ reset</button>
   <button class="reset-btn" id="rebalance-btn" onclick="rebalanceCurrentRound()">⇄ rebalance current round</button>
+  <button class="reset-btn" onclick="saveCheckpoint()">💾 save checkpoint</button>
+  <button class="reset-btn" onclick="restoreCheckpoint()">↩ restore checkpoint</button>
   <button class="reset-btn" id="score-toggle-btn" onclick="toggleScoring()">⚖ Use Weighted Scoring</button>
   <p class="score-help">Scoring guide: score badge = matchup quality, and the bar always shows win % (top fighter vs bottom fighter). Green is near 50/50, yellow/red means less balanced.</p>
 </header>
@@ -109,6 +111,8 @@ function pickPlayer(mid,player){const m=BK[mid];if(!m)return;if(!ST[mid])ST[mid]
 function undoMatch(mid){const m=BK[mid];if(!m||m.preset_winner)return;delete ST[mid];cascade(mid);save();renderAll();}
 function cascade(mid){Object.keys(BK).forEach(k=>{const m=BK[k];if((m.top?.src===mid||m.bot?.src===mid)&&ST[k]){delete ST[k];cascade(k);}});}
 function resetAll(){if(!confirm("Reset all results?"))return;ST={};save();renderAll();}
+async function saveCheckpoint(){try{const r=await fetch("/api/checkpoint",{method:"POST"});if(!r.ok)alert("Failed to save checkpoint.");else alert("Checkpoint saved.");}catch(e){alert("Failed to save checkpoint.");}}
+async function restoreCheckpoint(){if(!confirm("Restore the last checkpointed state?"))return;try{const r=await fetch("/api/checkpoint/restore",{method:"POST"});if(!r.ok){alert("No checkpoint found.");return;}const d=await r.json();ST=d;_sv=JSON.stringify(d);localStorage.setItem("um_v4",_sv);renderAll();}catch(e){alert("Failed to restore checkpoint.");}}
 function tbHtml(f){if(!f)return"";const dark=["S","A+","A"].includes(f.tier);return`<span class="tb" style="background:${f.tc||"#6b7280"};color:${dark?"#000":"#fff"}">${f.tier||"?"}</span>`;}
 function renderByes(){const el=document.getElementById("bye-list");if(!el)return;const seen=new Set();const byes=[];Object.values(BK).forEach(m=>{if(m.round!==2)return;[m.top,m.bot].forEach(s=>{if(s?.type==="known"&&!seen.has(s.id)){seen.add(s.id);byes.push(s);}});});el.innerHTML=byes.map(f=>`<div class="bye-chip">${tbHtml(f)} ${f.name}</div>`).join("");}
 function toggleScoring(){scoringMode=scoringMode==="standard"?"weighted":"standard";const btn=document.getElementById("score-toggle-btn");if(btn)btn.textContent=scoringMode==="standard"?"⚖ Use Weighted Scoring":"🎯 Use Standard Scoring";updateSB();}

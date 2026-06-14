@@ -14,6 +14,7 @@ if not HTML_FILE.is_absolute():
   HTML_FILE = ROOT_DIR / HTML_FILE
 
 STATE_FILE = ROOT_DIR / "data" / "state.json"
+CHECKPOINT_FILE = ROOT_DIR / "data" / "checkpoint.json"
 WIN_PCT_FILE = ROOT_DIR / "data" / "merged_win_pct.json"
 try:
     WIN_PCT = json.loads(WIN_PCT_FILE.read_text(encoding="utf-8"))
@@ -93,6 +94,30 @@ def set_state():
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     STATE_FILE.write_text(json.dumps(data), encoding="utf-8")
     return "", 204
+
+@app.route("/api/checkpoint", methods=["GET", "POST"])
+def checkpoint_state():
+    if not session.get("auth"):
+        return "", 401
+    CHECKPOINT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    if request.method == "POST":
+        state_text = STATE_FILE.read_text(encoding="utf-8") if STATE_FILE.exists() else "{}"
+        CHECKPOINT_FILE.write_text(state_text, encoding="utf-8")
+        return "", 204
+    if CHECKPOINT_FILE.exists():
+        return Response(CHECKPOINT_FILE.read_text(encoding="utf-8"), content_type="application/json")
+    return Response("{}", content_type="application/json")
+
+@app.route("/api/checkpoint/restore", methods=["POST"])
+def restore_checkpoint():
+    if not session.get("auth"):
+        return "", 401
+    if not CHECKPOINT_FILE.exists():
+        return Response("{}", content_type="application/json")
+    checkpoint_text = CHECKPOINT_FILE.read_text(encoding="utf-8")
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    STATE_FILE.write_text(checkpoint_text, encoding="utf-8")
+    return Response(checkpoint_text, content_type="application/json")
 
 @app.route("/api/win-pct", methods=["GET"])
 def get_win_pct():
