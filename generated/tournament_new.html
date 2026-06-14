@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚔ Unmatched Tournament</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#040913;--card:rgba(10,18,36,.96);--border:#1e3365;--border2:#2d4f8a;
+  --accent:#f59e0b;--text:#e2e8f0;--muted:#64748b;
+  --p1:#60a5fa;--p2:#fb923c;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(ellipse 120% 60% at 50% 0%,#0c1e40 0%,#040913 55%);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── Header ── */
+header{position:sticky;top:0;z-index:200;backdrop-filter:blur(14px);background:rgba(4,9,19,.88);border-bottom:1px solid var(--border);padding:.6rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.logo{font-size:1.05rem;font-weight:900;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
+
+/* scoreboard */
+.sb{display:flex;align-items:stretch;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.sbp{display:flex;flex-direction:column;align-items:center;padding:.25rem .7rem;background:rgba(10,18,36,.7);min-width:70px;transition:background .2s}
+.sbp.lead{background:rgba(29,78,216,.18)}
+.sbp .tag{font-size:.47rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.sbp .nm{font-size:.65rem;font-weight:700}
+.sbp .sc{font-size:1.45rem;font-weight:900;line-height:1.05}
+.sbp.p1 .sc,.sbp.p1 .nm{color:var(--p1)}
+.sbp.p2 .sc,.sbp.p2 .nm{color:var(--p2)}
+.sbvs{display:flex;align-items:center;padding:0 .35rem;background:rgba(10,18,36,.7);color:#334155;font-size:.5rem;font-weight:800}
+
+/* header buttons */
+.hbtns{display:flex;gap:.4rem;align-items:center}
+.hbtn{font-size:.65rem;font-weight:700;padding:.26rem .66rem;border-radius:5px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s}
+.hbtn:hover{color:#ef4444;border-color:#ef4444}
+.hbtn.rb{border-color:var(--accent);color:var(--accent)}
+.hbtn.rb:hover{background:var(--accent);color:#000}
+.hbtn:disabled{opacity:.35;cursor:not-allowed}
+
+/* ── Bracket area ── */
+.outer{overflow:auto;padding:2.8rem 1.8rem 4rem;scrollbar-width:thin;scrollbar-color:var(--border) var(--bg)}
+.outer::-webkit-scrollbar{height:5px;width:5px}
+.outer::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.wrap{position:relative}
+
+/* SVG lines */
+.bsvg{position:absolute;top:0;left:0;pointer-events:none;overflow:visible}
+
+/* round titles */
+.rtitle{position:absolute;top:4px;font-size:.58rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.18em;text-align:center;white-space:nowrap}
+
+/* ── Match card ── */
+.mc{position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;overflow:visible;transition:border-color .15s,box-shadow .15s}
+.mc.active{border-color:var(--border2);box-shadow:0 0 0 1px rgba(45,79,138,.4),0 6px 24px rgba(45,79,138,.2)}
+.mc.done{border-color:#1d4ed844}
+.mc.denied{border-color:#ef444455}
+.mc.dim{opacity:.38;pointer-events:none}
+
+/* fighter rows */
+.fr{flex:1;display:flex;align-items:center;padding:0 .45rem;gap:.28rem;cursor:pointer;min-height:0;border-radius:0;transition:background .12s;position:relative;overflow:hidden}
+.fr:first-of-type{border-radius:7px 7px 0 0}
+.fr:last-of-type{border-radius:0 0 7px 7px}
+.fr.playable:hover{background:rgba(255,255,255,.06)}
+.fr.won{background:rgba(245,158,11,.1)}
+.fr.lost{background:rgba(0,0,0,.25)}
+.fr.tbd{pointer-events:none;cursor:default}
+.fr-div{height:1px;background:var(--border);flex-shrink:0}
+
+/* fighter name */
+.fn{font-size:.7rem;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
+.fr.won .fn{color:var(--accent);font-weight:800}
+.fr.lost .fn{color:#334155;text-decoration:line-through}
+.fr.tbd .fn{color:var(--muted);font-style:italic;font-size:.63rem}
+.crown{font-size:.55rem;flex-shrink:0}
+
+/* tier badge */
+.tb{font-size:.43rem;padding:.03rem .17rem;border-radius:3px;font-weight:800;flex-shrink:0;line-height:1.5}
+
+/* win% dot */
+.wdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+
+/* win bar (bottom of card) */
+.wbar{position:absolute;bottom:0;left:0;width:100%;height:2px;background:#111f3a;border-radius:0 0 8px 8px;overflow:hidden;pointer-events:none}
+.wbar-f{height:100%;transition:width .5s}
+
+/* ── Below-card elements ── */
+.pp{position:absolute;bottom:-26px;left:0;width:100%;display:flex;gap:2px;z-index:60}
+.ppb{flex:1;padding:.16rem .08rem;font-size:.57rem;font-weight:700;border:none;border-radius:3px;cursor:pointer;transition:opacity .15s}
+.ppb:hover{opacity:.82}
+.ppb.p1{background:#2563eb;color:#fff}
+.ppb.p2{background:#ea580c;color:#fff}
+
+.ptag{position:absolute;bottom:-18px;left:0;width:100%;text-align:center;font-size:.52rem;font-weight:700;white-space:nowrap}
+
+.ubtn{position:absolute;top:-19px;right:0;font-size:.46rem;color:var(--muted);background:rgba(4,9,19,.85);border:1px solid #334155;border-radius:3px;padding:.05rem .2rem;cursor:pointer;opacity:0;transition:opacity .15s,color .15s;z-index:10}
+.mc:hover .ubtn{opacity:1}
+.ubtn:hover{color:#ef4444;border-color:#ef4444}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">⚔ Unmatched Tournament</span>
+  <div class="sb">
+    <div class="sbp p1" id="p1panel"><span class="tag">P1</span><span class="nm">Ahmad</span><span class="sc" id="p1s">0</span></div>
+    <div class="sbvs">VS</div>
+    <div class="sbp p2" id="p2panel"><span class="tag">P2</span><span class="nm">Mohammad</span><span class="sc" id="p2s">0</span></div>
+  </div>
+  <div class="hbtns">
+    <button class="hbtn rb" id="rb" onclick="rebalance()">⇄ Rebalance</button>
+    <button class="hbtn" onclick="resetAll()">↺ Reset</button>
+  </div>
+</header>
+
+<div class="outer">
+  <div class="wrap" id="wrap"></div>
+</div>
+
+<script>
+// ── Layout constants ──────────────────────────────────────────────────────────
+const H=56,S=68,W=164,CGAP=60,CW=W+CGAP;
+const TITLE_H=28;
+const ROUND_DEFS=[
+  {r:1,n:16,label:"Round 1",    ids:Array.from({length:16},(_,i)=>`r1_${i+1}`)},
+  {r:2,n:8, label:"Round 2",    ids:Array.from({length:8}, (_,i)=>`r2_${i+1}`)},
+  {r:3,n:4, label:"Quarter-Finals",ids:Array.from({length:4},(_,i)=>`qf_${i+1}`)},
+  {r:4,n:2, label:"Semi-Finals",ids:Array.from({length:2},(_,i)=>`sf_${i+1}`)},
+  {r:5,n:1, label:"Final",      ids:["final"]},
+];
+const PNAME={P1:"Ahmad",P2:"Mohammad"};
+const PC={P1:"#60a5fa",P2:"#fb923c"};
+
+let BK={},ST={},_sv="{}";
+const WPC={};
+
+// ── Position math ─────────────────────────────────────────────────────────────
+function cx(r){return(r-1)*CW;}
+function cy(r,i){
+  if(r===1)return i*S;
+  const c0=cy(r-1,i*2)+H/2,c1=cy(r-1,i*2+1)+H/2;
+  return(c0+c1)/2-H/2;
+}
+const TOTAL_W=cx(5)+W;
+const TOTAL_H=cy(1,15)+H+60;
+
+// ── State helpers ─────────────────────────────────────────────────────────────
+function win(mid){const m=BK[mid];if(!m)return null;if(m.preset_winner)return m.preset_winner;return ST[mid]?.winner||null;}
+function slotOf(mid,side){const ov=ST.__layout?.[mid]?.[side];if(ov?.id)return{type:"known",...ov};return BK[mid]?.[side]||null;}
+function resolve(sl){
+  if(!sl)return null;
+  if(sl.type==="known")return{id:sl.id,name:sl.name,tier:sl.tier,tc:sl.tc};
+  const w=win(sl.src);if(!w)return null;return dig(sl.src,w);
+}
+function dig(mid,fid){
+  const m=BK[mid];if(!m)return{id:fid,name:fid,tier:"?",tc:"#6b7280"};
+  const t=resolve(slotOf(mid,"top"));if(t&&t.id===fid)return t;
+  const b=resolve(slotOf(mid,"bot"));if(b&&b.id===fid)return b;
+  return{id:fid,name:fid,tier:"?",tc:"#6b7280"};
+}
+function midsForRound(r){return Object.keys(BK).filter(m=>BK[m].round===r);}
+function curRound(){
+  const rs=[...new Set(Object.values(BK).map(m=>m.round))].sort((a,b)=>a-b);
+  for(const r of rs)if(!midsForRound(r).every(m=>!!win(m)))return r;
+  return null;
+}
+
+// ── Persist ───────────────────────────────────────────────────────────────────
+async function save(){
+  const j=JSON.stringify(ST);_sv=j;localStorage.setItem("um_v5",j);
+  try{await fetch("/api/state",{method:"POST",headers:{"Content-Type":"application/json"},body:j});}catch(e){}
+}
+async function poll(){
+  try{const r=await fetch("/api/state");if(!r.ok)return;const d=await r.json();const j=JSON.stringify(d);if(j!==_sv){ST=d;_sv=j;renderAll();}}catch(e){}
+}
+
+// ── Win% cache ────────────────────────────────────────────────────────────────
+function pk(a,b){return a<b?`${a}|${b}`:`${b}|${a}`;}
+async function fetchWp(a,b){
+  const k=pk(a,b);if(k in WPC)return WPC[k];
+  try{
+    const r=await fetch(`/api/winpct?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`);
+    if(!r.ok){WPC[k]=null;return null;}
+    const d=await r.json();
+    if(d.wp!=null){const v={wp:Math.round(d.wp*10)/10,wp_b:Math.round(d.wp_b*10)/10};WPC[k]=v;return v;}
+    WPC[k]=null;return null;
+  }catch(e){WPC[k]=null;return null;}
+}
+function getWp(a,b){const k=pk(a,b),c=WPC[k];if(!c)return null;return a<b?{wp:c.wp,wp_b:c.wp_b}:{wp:c.wp_b,wp_b:c.wp};}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+function pickWin(mid,side){
+  const m=BK[mid];if(!m||m.preset_winner)return;
+  const f=resolve(slotOf(mid,side));if(!f)return;
+  ST[mid]={winner:f.id,side};save();renderAll();
+}
+function pickPl(mid,pl){
+  if(!ST[mid])ST[mid]={winner:BK[mid]?.preset_winner,side:"top"};
+  ST[mid].player=pl;save();renderAll();
+}
+function undo(mid){
+  const m=BK[mid];if(!m||m.preset_winner)return;
+  delete ST[mid];cascade(mid);save();renderAll();
+}
+function cascade(mid){Object.keys(BK).forEach(k=>{const m=BK[k];if((m.top?.src===mid||m.bot?.src===mid)&&ST[k]){delete ST[k];cascade(k);}});}
+function resetAll(){if(!confirm("Reset all results?"))return;ST={};save();renderAll();}
+
+// ── Scoreboard ────────────────────────────────────────────────────────────────
+function updateSB(){
+  let p1=0,p2=0;Object.values(ST).forEach(r=>{if(r.player==="P1")p1++;else if(r.player==="P2")p2++;});
+  document.getElementById("p1s").textContent=p1;document.getElementById("p2s").textContent=p2;
+  document.getElementById("p1panel").classList.toggle("lead",p1>p2);
+  document.getElementById("p2panel").classList.toggle("lead",p2>p1);
+}
+
+// ── Rebalance ─────────────────────────────────────────────────────────────────
+async function rebalance(){
+  const btn=document.getElementById("rb");btn.disabled=true;btn.textContent="⏳…";
+  try{
+    const r=curRound();if(r==null){alert("Tournament complete.");return;}
+    const ms=midsForRound(r),fighters=[];
+    for(const mid of ms){
+      const tf=resolve(slotOf(mid,"top")),bf=resolve(slotOf(mid,"bot"));
+      if(!tf||!bf){alert("Finish the previous round first.");return;}
+      fighters.push(tf.id,bf.id);
+    }
+    const resp=await fetch("/api/rebalance",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({fighters})});
+    if(!resp.ok){alert("Rebalance request failed.");return;}
+    const data=await resp.json();
+    const allR=[...new Set(Object.values(BK).map(m=>m.round))].sort((a,b)=>a-b);
+    allR.filter(rn=>rn>=r).forEach(rn=>midsForRound(rn).forEach(m=>{delete ST[m];}));
+    if(!ST.__layout)ST.__layout={};
+    data.pairs.forEach((p,i)=>{
+      const mid=ms[i];ST.__layout[mid]={top:p.top,bot:p.bot};
+      WPC[pk(p.top.id,p.bot.id)]={wp:p.wp,wp_b:p.wp_b};
+    });
+    await save();renderAll();
+    const bad=data.pairs.filter(p=>Math.abs(p.wp-50)>5).length;
+    alert(data.all_balanced?"✓ Balanced!":`Best effort — ${bad} matchup${bad!==1?"s":""} still unbalanced.`);
+  }finally{btn.disabled=false;btn.textContent="⇄ Rebalance";}
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function devC(wp){const d=Math.abs(wp-50);return d<=2?"#22c55e":d<=5?"#84cc16":d<=8?"#f97316":"#ef4444";}
+function tbHtml(f){if(!f)return"";const dk=["S","A+","A"].includes(f.tier);return`<span class="tb" style="background:${f.tc};color:${dk?"#000":"#fff"}">${f.tier}</span>`;}
+
+// ── Render one card ───────────────────────────────────────────────────────────
+function renderCard(mid){
+  const el=document.getElementById("mc-"+mid);if(!el)return;
+  const m=BK[mid];
+  const tf=resolve(slotOf(mid,"top")),bf=resolve(slotOf(mid,"bot"));
+  const w=win(mid),res=ST[mid],isPreset=!!m.preset_winner;
+  const both=!!(tf&&bf),hasW=!!w;
+  const hasPl=!!(res?.player||(isPreset&&ST[mid]?.player));
+  const waiting=hasW&&!hasPl,done=hasW&&hasPl;
+
+  let wpd=m.meta;
+  if(!wpd&&both){
+    wpd=getWp(tf.id,bf.id);
+    if(!(pk(tf.id,bf.id) in WPC)){fetchWp(tf.id,bf.id).then(d=>{if(d)renderCard(mid);});}
+  }
+  const denied=wpd?Math.abs(wpd.wp-50)>8:false;
+
+  let cls="mc";
+  if(!hasW&&both&&!isPreset)cls+=" active";
+  if(done)cls+=" done";
+  if(denied)cls+=" denied";
+  if(!both&&!isPreset)cls+=" dim";
+  el.className=cls;
+
+  function fRow(f,side){
+    if(!f){const src=BK[mid]?.[side]?.src;return`<div class="fr tbd"><span class="fn">⏳ ${src?"W: "+src:"TBD"}</span></div>`;}
+    const isW=w&&f.id===w,isL=w&&f.id!==w;
+    const clickable=!hasW&&both&&!isPreset;
+    const dot=wpd?.wp!=null?`<span class="wdot" style="background:${devC(side==="top"?wpd.wp:wpd.wp_b)}"></span>`:"";
+    return`<div class="fr${isW?" won":isL?" lost":""}${clickable?" playable":""}" ${clickable?`onclick="pickWin('${mid}','${side}')"`:""}>`
+      +(isW?`<span class="crown">♛</span>`:"")+tbHtml(f)+`<span class="fn">${f.name}</span>`+dot+`</div>`;
+  }
+
+  let extra="";
+  if(waiting){
+    extra=`<div class="pp"><button class="ppb p1" onclick="pickPl('${mid}','P1')">Ahmad</button><button class="ppb p2" onclick="pickPl('${mid}','P2')">Mohammad</button></div>`;
+  }else if(done){
+    const pl=res?.player,pc=pl?PC[pl]:"#94a3b8";
+    if(isPreset&&!pl){
+      extra=`<div class="pp"><button class="ppb p1" onclick="pickPl('${mid}','P1')">Ahmad</button><button class="ppb p2" onclick="pickPl('${mid}','P2')">Mohammad</button></div>`;
+    }else{
+      extra=`<div class="ptag" style="color:${pc}">🎮 ${pl?PNAME[pl]:"—"}</div>`;
+    }
+  }
+
+  const ubtn=(!isPreset&&hasW)?`<button class="ubtn" onclick="event.stopPropagation();undo('${mid}')">↩ undo</button>`:"";
+  const wbar=wpd?.wp!=null?`<div class="wbar"><div class="wbar-f" style="width:${wpd.wp}%;background:${devC(wpd.wp)}"></div></div>`:"";
+
+  el.innerHTML=ubtn+fRow(tf,"top")+`<div class="fr-div"></div>`+fRow(bf,"bot")+wbar+extra;
+}
+
+// ── Build bracket DOM (once) ──────────────────────────────────────────────────
+function buildBracket(){
+  const wrap=document.getElementById("wrap");
+  wrap.style.width=TOTAL_W+"px";
+  wrap.style.height=(TOTAL_H+TITLE_H)+"px";
+
+  // SVG connector lines
+  const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.classList.add("bsvg");
+  svg.setAttribute("width",TOTAL_W);
+  svg.setAttribute("height",TOTAL_H+TITLE_H);
+
+  // Gradient for horizontal lines
+  const defs=document.createElementNS("http://www.w3.org/2000/svg","defs");
+  const g=document.createElementNS("http://www.w3.org/2000/svg","linearGradient");
+  g.setAttribute("id","lg");g.setAttribute("x1","0%");g.setAttribute("y1","0%");g.setAttribute("x2","100%");g.setAttribute("y2","0%");
+  [[0,"#1e3365"],[100,"#2d5594"]].forEach(([o,c])=>{const s=document.createElementNS("http://www.w3.org/2000/svg","stop");s.setAttribute("offset",o+"%");s.setAttribute("stop-color",c);g.appendChild(s);});
+  defs.appendChild(g);svg.appendChild(defs);
+
+  function ln(x1,y1,x2,y2,vert){
+    const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+    [["x1",x1],["y1",y1],["x2",x2],["y2",y2],["stroke",vert?"#2d5594":"url(#lg)"],["stroke-width","1.5"],["stroke-linecap","round"]].forEach(([k,v])=>l.setAttribute(k,v));
+    svg.appendChild(l);
+  }
+
+  ROUND_DEFS.slice(1).forEach(({r,n})=>{
+    const midX=cx(r-1)+W+CGAP/2;
+    for(let i=0;i<n;i++){
+      const y0=TITLE_H+cy(r-1,i*2)+H/2;
+      const y1=TITLE_H+cy(r-1,i*2+1)+H/2;
+      const yM=TITLE_H+cy(r,i)+H/2;
+      const xL=cx(r-1)+W,xR=cx(r);
+      ln(xL,y0,midX,y0,false);
+      ln(xL,y1,midX,y1,false);
+      ln(midX,y0,midX,y1,true);
+      ln(midX,yM,xR,yM,false);
+    }
+  });
+  wrap.appendChild(svg);
+
+  // Round titles and card elements
+  ROUND_DEFS.forEach(({r,ids,label})=>{
+    const title=document.createElement("div");
+    title.className="rtitle";title.textContent=label;
+    title.style.cssText=`left:${cx(r)}px;width:${W}px;top:4px`;
+    wrap.appendChild(title);
+
+    ids.forEach((mid,i)=>{
+      const el=document.createElement("div");
+      el.id="mc-"+mid;el.className="mc";
+      el.style.cssText=`left:${cx(r)}px;top:${TITLE_H+cy(r,i)}px;width:${W}px;height:${H}px`;
+      wrap.appendChild(el);
+    });
+  });
+}
+
+// ── Render all ────────────────────────────────────────────────────────────────
+function renderAll(){
+  updateSB();
+  document.getElementById("rb").style.visibility=curRound()!=null?"":"hidden";
+  ROUND_DEFS.forEach(({ids})=>ids.forEach(renderCard));
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init(){
+  try{
+    const[bkR,stR]=await Promise.all([fetch("/api/bracket"),fetch("/api/state")]);
+    if(bkR.ok)BK=await bkR.json();
+    if(stR.ok){const d=await stR.json();ST=d;_sv=JSON.stringify(d);}
+    else{try{ST=JSON.parse(localStorage.getItem("um_v5")||"{}");}catch(e){}}
+  }catch(e){try{ST=JSON.parse(localStorage.getItem("um_v5")||"{}");}catch(e2){}}
+  buildBracket();
+  renderAll();
+}
+init();
+setInterval(poll,3000);
+</script>
+</body>
+</html>
