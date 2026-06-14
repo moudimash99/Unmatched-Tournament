@@ -174,7 +174,7 @@
     "jekyll_hyde": -2,
     "medusa": 31.0,
     "dracula": 50.0,
-    "raptors": 75.0,
+    "raptors": 55.0,
     "pandora": 43.99999999999999,
     "titania": 80.0,
     "king_arthur": 47.0,
@@ -1926,7 +1926,7 @@
   "raptors": {
     "bullseye": 59.945454545454545,
     "invisible_man": 84.53333333333333,
-    "loki": 25.0,
+    "loki": 45.0,
     "little_red": 74.18343195266272,
     "buffy": 40.21153846153846,
     "ciri": 59.58139534883721,
