@@ -1,9 +1,11 @@
 import os, hashlib
-from flask import Flask, request, session, redirect, send_file
+from pathlib import Path
+from flask import Flask, request, session, redirect, send_file, Response
 
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
 
+ROOT_DIR = Path(__file__).resolve().parent
 PW_HASH  = os.environ["PASSWORD_HASH"]
 HTML_FILE = os.environ.get("HTML_FILE", "tournament_a.html")
 
@@ -61,6 +63,7 @@ def index():
 def logout():
     session.clear()
     return redirect("/")
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8742))

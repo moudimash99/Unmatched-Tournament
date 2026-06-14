@@ -6,6 +6,8 @@ app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
+BRACKET_FILE = ROOT_DIR / "data" / "bracket.json"
+
 PW_HASH  = os.environ["PASSWORD_HASH"]
 HTML_FILE = Path(os.environ.get("HTML_FILE", "generated/tournament_a.html"))
 if not HTML_FILE.is_absolute():
@@ -104,6 +106,15 @@ def get_win_pct():
         "wp": WIN_PCT.get(a, {}).get(b),
         "wp_b": WIN_PCT.get(b, {}).get(a),
     }
+
+@app.route("/api/bracket", methods=["GET"])
+def get_bracket():
+    if not session.get("auth"):
+        return "", 401
+    if BRACKET_FILE.exists():
+        return Response(BRACKET_FILE.read_text(encoding="utf-8"), content_type="application/json")
+    return Response("{}", content_type="application/json")
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8742))
